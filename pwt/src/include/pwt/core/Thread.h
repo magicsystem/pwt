@@ -10,7 +10,7 @@
 #include "Object.h"
 namespace pwt {
 
-class Mutex: public PlatformObject {
+class PUBLIC Mutex: public PlatformObject {
 private:
 	void* handles[11];
 public:
@@ -22,7 +22,7 @@ public:
 	int unlock();
 };
 
-class MutexLocker {
+class PUBLIC MutexLocker {
 private:
 	Mutex* mutex;
 public:
@@ -30,7 +30,7 @@ public:
 	~MutexLocker();
 };
 
-class Thread: public PlatformObject {
+class PUBLIC Thread: public PlatformObject {
 public:
 	Thread();
 	~Thread();

@@ -9,14 +9,15 @@
 #define INCLUDE_PWT_CORE_MEMORY_H_
 #include <stdlib.h>
 #include <string.h>
+#include "config.h"
 namespace pwt {
 
-class IDestruct {
+class PUBLIC IDestruct {
 public:
 	virtual ~IDestruct();
 };
 
-class IMem: public IDestruct {
+class PUBLIC IMem: public IDestruct {
 public:
 	static IMem* getGlobal();
 	static IMem* createMem();
@@ -26,7 +27,7 @@ public:
 	virtual void free(void* ptr)=0;
 };
 
-class Mem: public IMem {
+class PUBLIC Mem: public IMem {
 public:
 	void* pages;
 	Mem();
@@ -38,14 +39,14 @@ public:
 
 } /* namespace pwt */
 
-void* operator new(size_t size);
-void* operator new(size_t size, pwt::IMem* mem);
+void* PUBLIC operator new(size_t size);
+void* PUBLIC operator new(size_t size, pwt::IMem* mem);
 inline void* operator new(size_t size, void* ptr) {
 	return ptr;
 }
 
-void operator delete(void* ptr);
-void operator delete(void* ptr, pwt::IMem* mem);
+void PUBLIC operator delete(void* ptr);
+void PUBLIC operator delete(void* ptr, pwt::IMem* mem);
 inline void operator delete(void* p, void* ptr) {
 }
 

@@ -7,6 +7,7 @@
 
 #ifndef INCLUDE_PWT_CORE_CORE_H_
 #define INCLUDE_PWT_CORE_CORE_H_
+#include "String.h"
 #include "Object.h"
 #include "Thread.h"
 

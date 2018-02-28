@@ -10,13 +10,13 @@
 #include "Memory.h"
 namespace pwt {
 
-class IObject: public IDestruct {
+class PUBLIC IObject: public IDestruct {
 public:
 	virtual void incRef()=0;
 	virtual void decRef()=0;
 };
 
-class Object: public IObject {
+class PUBLIC Object: public IObject {
 public:
 	int ref;
 	Object();
@@ -25,7 +25,7 @@ public:
 	void incRef();
 	void decRef();
 };
-class PlatformObject: public Object {
+class PUBLIC PlatformObject: public Object {
 public:
 	PlatformObject();
 	virtual bool isOk();
