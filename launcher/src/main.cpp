@@ -6,10 +6,12 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
-#include <iostream>
-using namespace std;
+#include <pwt.h>
+using namespace pwt;
+
 
 int main() {
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
+	App app;
+
 	return 0;
 }

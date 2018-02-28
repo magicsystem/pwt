@@ -62,6 +62,6 @@ void operator delete(void* ptr) {
 
 void operator delete(void* ptr, pwt::IMem* mem) {
 	if (mem == 0)
-		mem = pwt::IMem::getGlobal()->free(ptr);
+		pwt::IMem::getGlobal()->free(ptr);
 	return mem->free(ptr);
 }
