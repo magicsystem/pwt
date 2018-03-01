@@ -39,7 +39,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1731845953" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 							<tool command="g++ " commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX} ../../bin/Debug/${OUTPUT} ${INPUTS} -Wl,-rpath,&quot;\$$ORIGIN&quot;" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.349902321" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.paths.1237988115" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
-									<listOptionValue builtIn="false" value="/media/azeddine/data/development/projet/git/eclipse/pwt/bin/Debug"/>
+									<listOptionValue builtIn="false" value="../../bin/Debug"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.906018747" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="pwt"/>
@@ -98,7 +98,13 @@
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1958867461" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.884430052" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release"/>
-							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX} ../../bin/Release/${OUTPUT} ${INPUTS}" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.571693288" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
+							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX} ../../bin/Release/${OUTPUT} ${INPUTS} -Wl,-rpath,&quot;\$$ORIGIN&quot;" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.571693288" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
+								<option id="gnu.cpp.link.option.paths.1620793835" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
+									<listOptionValue builtIn="false" value="../../bin/Release"/>
+								</option>
+								<option id="gnu.cpp.link.option.libs.274671038" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
+									<listOptionValue builtIn="false" value="pwt"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1875939183" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

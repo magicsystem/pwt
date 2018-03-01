@@ -21,7 +21,7 @@ private:
 	void* handles[5];
 protected:
 	Component();
-	virtual ComponentPeer* getComponentPeer();
+	virtual ComponentPeer* getComponentPeer()=0;
 public:
 	virtual ~Component();
 	virtual void create(Container* parent);

@@ -22,7 +22,6 @@ private:
 		StringRef* ref;
 		const char* chars;
 	};
-	static StringRef empty;
 protected:
 	static StringRef* newString(int len, IMem* mem = 0);
 	static StringRef* newString(const char* str, int len, IMem* mem = 0);

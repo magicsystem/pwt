@@ -5,8 +5,8 @@
  *      Author: azeddine
  */
 #include <pwt.h>
-#ifdef __linux
-#include <gtk/gtk.h>
+#ifdef __WIN
+#include <windows.h>
 
 namespace pwt {
 App* App::defaultApp = 0;
@@ -43,12 +43,16 @@ Toolkit* App::setDefaultToolkit(Toolkit* toolkit) {
 }
 
 int App::run() {
-	gtk_main();
-	return 1;
+	MSG Msg;
+	while (GetMessage(&Msg, NULL, 0, 0)) {
+		TranslateMessage(&Msg);
+		DispatchMessage(&Msg);
+	}
+	return Msg.wParam;
 }
 
 int App::exit() {
-	gtk_main_quit();
+	PostQuitMessage(1);
 	return 1;
 }
 

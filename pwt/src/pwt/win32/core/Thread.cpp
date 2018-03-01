@@ -5,60 +5,55 @@
  *      Author: azeddine
  */
 
-
 #include <pwt.h>
-#ifdef __linux
-#include <pthread.h>
+#ifdef __WIN
+#include <windows.h>
 
 namespace pwt {
-struct mutex_linux {
-	pthread_mutex_t mutex;
-	bool is_ok :1;
+struct mutex_windows {
+	CRITICAL_SECTION mutex;
+	//bool is_ok :1;
 };
 
 Mutex::Mutex() {
+	mutex_windows* m = (mutex_windows*) this->handles;
+	memset(m, 0, sizeof(mutex_windows));
 	create();
 }
 
 Mutex::~Mutex() {
-	mutex_linux* m = (mutex_linux*) this->handles;
-	if (m->is_ok) {
-		pthread_mutex_destroy(&m->mutex);
-	}
+	mutex_windows* m = (mutex_windows*) this->handles;
+	//if (m->is_ok) {
+	DeleteCriticalSection(&m->mutex);
+	//}
 }
 
 int Mutex::create() {
-	mutex_linux* m = (mutex_linux*) this->handles;
-	int err = pthread_mutex_init(&m->mutex, 0);
-	if (err != 0) {
-		m->is_ok = false;
-		memset(&m->mutex, 0, sizeof(pthread_mutex_t));
-	} else {
-		m->is_ok = true;
-	}
+	mutex_windows* m = (mutex_windows*) this->handles;
+	InitializeCriticalSection(&m->mutex);
+	//m->is_ok = true;
+	return 1;
 }
 
 bool Mutex::isOk() {
-	mutex_linux* m = (mutex_linux*) this->handles;
-	return m->is_ok;
+	return true;
 }
 
 int Mutex::lock() {
-	mutex_linux* m = (mutex_linux*) this->handles;
-	int err = 0;
-	if (m->is_ok) {
-		err = pthread_mutex_lock(&m->mutex);
-	}
-	return err;
+	mutex_windows* m = (mutex_windows*) this->handles;
+	//if (m->is_ok) {
+	EnterCriticalSection(&m->mutex);
+	//}
+	return 1;
 }
 
 int Mutex::unlock() {
-	mutex_linux* m = (mutex_linux*) this->handles;
-	int err = 0;
-	if (m->is_ok) {
-		err = pthread_mutex_unlock(&m->mutex);
-	}
-	return err;
+	mutex_windows* m = (mutex_windows*) this->handles;
+	//int err = 0;
+	//if (m->is_ok) {
+	LeaveCriticalSection(&m->mutex);
+	//}
+	return 1;
 }
 
 MutexLocker::MutexLocker(Mutex& mutex) {
@@ -132,7 +127,6 @@ int Thread::getId() {
 
 Thread::State Thread::getState() {
 }
-
 
 } /* namespace pwt */
 #endif

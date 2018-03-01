@@ -6,11 +6,8 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
-#include <pwt.h>
-using namespace pwt;
+#include "test/test.h"
 
 int main() {
-	App app;
-
-	return app.run();
+	test_0();
 }

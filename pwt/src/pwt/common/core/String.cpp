@@ -12,7 +12,7 @@
 
 namespace pwt {
 
-String::StringRef String::empty = { 0, 1, 0 };
+unsigned char String_empty[] = { 0, 1, 0 , 0 };
 
 String::String() {
 	this->chars = 0;
@@ -37,7 +37,7 @@ String::~String() {
 String::String(const char* str) {
 	if (str != 0) {
 		if (str[0] == 0) {
-			this->ref = &empty;
+			this->ref = (StringRef*)String_empty;
 			return;
 		}
 	}
@@ -53,7 +53,7 @@ void String::operator =(const char* str) {
 	}
 	if (str != 0) {
 		if (str[0] == 0) {
-			this->ref = &empty;
+			this->ref = (StringRef*)String_empty;
 			return;
 		}
 	}
