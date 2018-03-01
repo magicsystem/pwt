@@ -29,5 +29,4 @@
 
 
 
-
 #endif /* INCLUDE_PWT_CORE_CONFIG_H_ */

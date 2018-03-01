@@ -10,6 +10,10 @@
 #include "core/core.h"
 #include "graphics/Rectangle.h"
 #include "graphics/Color.h"
+#include "widgets/Frame.h"
+#include "widgets/Button.h"
+#include "widgets/Canvas.h"
+#include "widgets/Toolkit.h"
 
 
 

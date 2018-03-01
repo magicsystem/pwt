@@ -31,7 +31,7 @@ struct LineAttributes {
 	unsigned join :3;
 	unsigned dashOffset :16;
 	unsigned miterLimit :16;
-	//ArrayType<float>* dash;
+	ArrayObject<float>* dash;
 };
 class Graphics: public PlatformObject {
 private:

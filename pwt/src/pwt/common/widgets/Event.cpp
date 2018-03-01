@@ -6,7 +6,15 @@
  */
 
 #include <pwt.h>
-
 namespace pwt {
 
-} /* namespace pwt */
+Event::Event() {
+	// TODO Auto-generated constructor stub
+
+}
+
+Event::~Event() {
+	// TODO Auto-generated destructor stub
+}
+
+}  // namespace pwt

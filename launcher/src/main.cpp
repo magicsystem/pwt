@@ -9,9 +9,8 @@
 #include <pwt.h>
 using namespace pwt;
 
-
 int main() {
 	App app;
 
-	return 0;
+	return app.run();
 }

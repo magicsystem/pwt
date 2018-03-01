@@ -12,5 +12,6 @@
 #include "Object.h"
 #include "Thread.h"
 #include "App.h"
+#include "ArrayObject.h"
 
 #endif /* INCLUDE_PWT_CORE_CORE_H_ */
