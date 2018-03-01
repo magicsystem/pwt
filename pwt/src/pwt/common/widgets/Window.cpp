@@ -13,7 +13,7 @@ Window::Window() {
 }
 
 WindowPeer* Window::getWindowPeer() {
-	return (WindowPeer*)this->peer;
+	return (WindowPeer*) this->peer;
 }
 
 ContainerPeer* Window::getContainerPeer() {
@@ -25,5 +25,10 @@ ComponentPeer* Window::getComponentPeer() {
 }
 
 Window::~Window() {
+	WindowPeer* peer = getWindowPeer();
+	if (peer != 0) {
+		peer->dispose(this);
+		this->peer = 0;
+	}
 }
 }  // namespace pwt

@@ -11,14 +11,14 @@
 namespace pwt {
 class Component;
 class Container;
-class NativeEvent;
+class PlatformEvent;
 
-class Event {
+class PUBLIC Event {
 public:
 	Event();
 	~Event();
 public:
-	NativeEvent* nativeEvent;
+	PlatformEvent* nativeEvent;
 	unsigned short clazz;
 	unsigned short type;
 	void* source;
@@ -48,7 +48,7 @@ public:
 class Graphics;
 class ComponentEvent: public Event {
 public:
-	Graphics* gc;
+	//Graphics* gc;
 	enum {
 		COMPONENT_MOVED,
 		COMPONENT_RESIZED = 1,
@@ -1057,6 +1057,7 @@ public:
 		 */
 		UPDATE //801
 	};
+	Graphics* gc;
 
 	/**
 	 * This is the rectangle that represents the area on the source

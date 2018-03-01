@@ -7,10 +7,10 @@
 
 #ifndef INCLUDE_PWT_CORE_APP_H_
 #define INCLUDE_PWT_CORE_APP_H_
-
+#include "config.h"
 namespace pwt {
 class Toolkit;
-class App {
+class PUBLIC App {
 private:
 	static App* defaultApp;
 	void* reserved[5];

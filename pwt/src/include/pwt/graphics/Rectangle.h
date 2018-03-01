@@ -7,6 +7,7 @@
 
 #ifndef INCLUDE_PWT_GRAPHICS_RECTANGLE_H_
 #define INCLUDE_PWT_GRAPHICS_RECTANGLE_H_
+#include "../core/core.h"
 
 namespace pwt {
 /**
@@ -16,7 +17,7 @@ namespace pwt {
  * @author      Sami Shaio
  * @since       1.0
  */
-class Point {
+class PUBLIC Point {
 public:
     /**
      * The X coordinate of this <code>Point</code>.
@@ -193,7 +194,7 @@ public:
  * @see         java.awt.LayoutManager
  * @since       1.0
  */
-class Dimension {
+class PUBLIC Dimension {
 public:
 
     /**
@@ -403,7 +404,7 @@ public:
  * @author      Sami Shaio
  * @since 1.0
  */
- class Rectangle
+ class PUBLIC Rectangle
 {
  public:
     /**

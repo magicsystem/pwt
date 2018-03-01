@@ -11,18 +11,20 @@
 namespace pwt {
 class Toolkit;
 class Container;
-class ComponentPeer {
+class ComponentPeer: public IDestruct {
 public:
 	static inline void* getReserved(Component* c) {
 		return c->handles;
 	}
-	static inline ComponentPeer* getPeer(Component* c){
+	static inline ComponentPeer* getPeer(Component* c) {
 		return c->getComponentPeer();
 	}
-	static inline void sendEvent(Component* c,Event* e){
+	static inline void sendEvent(Component* c, Event* e) {
 		c->postEvent(e);
 	}
-	virtual ~ComponentPeer();
+	static inline void sendPlatformEvent(Component* c, PlatformEvent* e) {
+		c->postPlatformEvent(e);
+	}
 	virtual void create(Component* c, Container* parent)=0;
 	virtual void dispose(Component* c)=0;
 	virtual Toolkit* getToolkit()=0;
@@ -30,14 +32,14 @@ public:
 	virtual void setBounds(Component* c, Rectangle& r)=0;
 	virtual void getBounds(Component* c, Rectangle& r)=0;
 	virtual void postEvent(Component* c, Event* e)=0;
-	virtual void postNativeEvent(Component* c, NativeEvent* e)=0;
+	virtual void postNativeEvent(Component* c, PlatformEvent* e)=0;
 };
 class ButtonPeer: public virtual ComponentPeer {
 public:
 	virtual String getLabel(Component* c)=0;
 	virtual void setLabel(Component* c, String label)=0;
 };
-class CanvasPeer:public virtual ComponentPeer {
+class CanvasPeer: public virtual ComponentPeer {
 
 };
 class ContainerPeer: public virtual ComponentPeer {
@@ -62,7 +64,5 @@ public:
 	virtual void getMaximizedBounds(Component* f, Rectangle& bounds)=0;
 };
 }  // namespace pwt
-
-
 
 #endif /* INCLUDE_PWT_WIDGETS_PEER_H_ */

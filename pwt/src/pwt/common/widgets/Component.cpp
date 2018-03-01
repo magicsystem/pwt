@@ -7,9 +7,6 @@
 
 #include <pwt.h>
 namespace pwt {
-ComponentPeer::~ComponentPeer() {
-
-}
 ComponentPeer* Component::getComponentPeer() {
 	return (ComponentPeer*) this->peer;
 }
@@ -22,6 +19,7 @@ Component::~Component() {
 	ComponentPeer* peer = getComponentPeer();
 	if (peer != 0) {
 		peer->dispose(this);
+		this->peer = 0;
 	}
 }
 void Component::setVisible(bool b) {
@@ -57,7 +55,12 @@ void Component::getBounds(Rectangle& r) {
 		memset(&r, 0, sizeof((r)));
 	}
 }
-
+void pwt::Component::postPlatformEvent(PlatformEvent* e) {
+	ComponentPeer* peer = getComponentPeer();
+	if (peer != 0) {
+		peer->postNativeEvent(this, e);
+	}
+}
 void Component::postEvent(Event* e) {
 	processEvent(*e);
 }
@@ -139,3 +142,4 @@ void Component::processMouseWheelEvent(MouseWheelEvent& e) {
 }
 
 }  // namespace pwt
+

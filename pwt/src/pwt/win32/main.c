@@ -13,16 +13,16 @@
 #ifdef __WIN
 #include <windows.h>
 
-HINSTANCE hinstance;
+HINSTANCE hinst;
 int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpvReserved) {
 
 	switch (dwReason) {
 	case DLL_PROCESS_ATTACH:
-		hinstance = hInstance;
+		hinst = hInstance;
 		break;
 
 	case DLL_PROCESS_DETACH:
-		hinstance = 0;
+		hinst = 0;
 		break;
 
 	case DLL_THREAD_ATTACH:

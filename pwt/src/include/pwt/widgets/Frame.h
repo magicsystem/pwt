@@ -11,7 +11,7 @@
 #include "Window.h"
 namespace pwt {
 class FramePeer;
-class Frame: public Window {
+class PUBLIC Frame: public Window {
 protected:
 	WindowPeer* getWindowPeer();
 	ContainerPeer* getContainerPeer();

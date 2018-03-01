@@ -12,7 +12,7 @@ namespace pwt {
 
 class Graphics;
 class InputStream;
-class Image: public PlatformObject {
+class PUBLIC Image: public PlatformObject {
 private:
 	void* handles[2];
 public:

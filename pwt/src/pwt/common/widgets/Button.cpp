@@ -5,7 +5,6 @@
  *      Author: azeddine
  */
 
-
 #include <pwt.h>
 namespace pwt {
 Button::Button() {
@@ -13,6 +12,11 @@ Button::Button() {
 }
 
 Button::~Button() {
+	ButtonPeer* peer = getButtonPeer();
+	if (peer != 0) {
+		peer->dispose(this);
+		this->peer = 0;
+	}
 }
 ComponentPeer* Button::getComponentPeer() {
 	return getButtonPeer();

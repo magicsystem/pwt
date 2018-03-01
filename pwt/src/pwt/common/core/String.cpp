@@ -424,5 +424,163 @@ String String::substring(int beginIndex, int endIndex) {
 		return String(beginIndex, endIndex - beginIndex, this->getChars());
 	}
 }
+int String::utf8_bytes_to_widechar(const char* str, int length, unsigned int *pwc) {
+	unsigned char c = str[0], *s = (unsigned char*) str;
+	if (str == 0 || length <= 0)
+		return 0;
 
+	if (c < 0x80) {
+		*pwc = c;
+		return 1;
+	} else if (c < 0xc2) {
+		return -1;
+	} else if (c < 0xe0) {
+		if (length >= 1) {
+			if (!((s[1] ^ 0x80) < 0x40))
+				return -1;
+			*pwc = ((c & 0x1f) << 6) | (s[1] ^ 0x80);
+		}
+		return 2;
+	} else if (c < 0xf0) {
+		if (length >= 2) {
+			if (!((s[1] ^ 0x80) < 0x40 && (s[2] ^ 0x80) < 0x40
+					&& (c >= 0xe1 || s[1] >= 0xa0)))
+				return -1;
+			*pwc = ((c & 0x0f) << 12) | ((s[1] ^ 0x80) << 6) | (s[2] ^ 0x80);
+		}
+		return 3;
+	} else if (c < 0xf8) {
+		if (length >= 3) {
+			if (!((s[1] ^ 0x80) < 0x40 && (s[2] ^ 0x80) < 0x40
+					&& (s[3] ^ 0x80) < 0x40 && (c >= 0xf1 || s[1] >= 0x90)))
+				return -1;
+			*pwc = ((c & 0x07) << 18) | ((s[1] ^ 0x80) << 12)
+					| ((s[2] ^ 0x80) << 6) | (s[3] ^ 0x80);
+		}
+		return 4;
+	} else if (c < 0xfc) {
+		if (length >= 4) {
+			if (!((s[1] ^ 0x80) < 0x40 && (s[2] ^ 0x80) < 0x40
+					&& (s[3] ^ 0x80) < 0x40 && (s[4] ^ 0x80) < 0x40
+					&& (c >= 0xf9 || s[1] >= 0x88)))
+				return -1;
+			*pwc = ((c & 0x03) << 24) | ((s[1] ^ 0x80) << 18)
+					| ((s[2] ^ 0x80) << 12) | ((s[3] ^ 0x80) << 6)
+					| (s[4] ^ 0x80);
+		}
+		return 5;
+	} else if (c < 0xfe) {
+		if (length >= 5) {
+			if (!((s[1] ^ 0x80) < 0x40 && (s[2] ^ 0x80) < 0x40
+					&& (s[3] ^ 0x80) < 0x40 && (s[4] ^ 0x80) < 0x40
+					&& (s[5] ^ 0x80) < 0x40 && (c >= 0xfd || s[1] >= 0x84)))
+				return -1;
+			*pwc = ((c & 0x01) << 30) | ((s[1] ^ 0x80) << 24)
+					| ((s[2] ^ 0x80) << 18) | ((s[3] ^ 0x80) << 12)
+					| ((s[4] ^ 0x80) << 6) | (s[5] ^ 0x80);
+		}
+		return 6;
+	} else
+		return -1;
+
+	return 0;
+}
+int String::utf8_widechar_to_bytes(char* s, int length, unsigned int wc) {
+	int count;
+	if (wc < 0x80)
+		count = 1;
+	else if (wc < 0x800)
+		count = 2;
+	else if (wc < 0x10000)
+		count = 3;
+	else if (wc < 0x200000)
+		count = 4;
+	else if (wc < 0x4000000)
+		count = 5;
+	else if (wc <= 0x7fffffff)
+		count = 6;
+	else
+		return -1;
+	if (length < count)
+		return count;
+	if (count >= 6) {
+		s[5] = 0x80 | (wc & 0x3f);
+		wc = wc >> 6;
+		wc |= 0x4000000;
+	}
+	if (count >= 5) {
+		s[4] = 0x80 | (wc & 0x3f);
+		wc = wc >> 6;
+		wc |= 0x200000;
+	}
+	if (count >= 4) {
+		s[3] = 0x80 | (wc & 0x3f);
+		wc = wc >> 6;
+		wc |= 0x10000;
+	}
+	if (count >= 3) {
+		s[2] = 0x80 | (wc & 0x3f);
+		wc = wc >> 6;
+		wc |= 0x800;
+	}
+	if (count >= 2) {
+		s[1] = 0x80 | (wc & 0x3f);
+		wc = wc >> 6;
+		wc |= 0xc0;
+	}
+	if (count >= 1) {
+		s[0] = wc;
+	}
+	return count;
+}
+int String::utf8_from_unicode(const wchar_t *unicode, int unicode_length, char* utf8,
+		int utf8_lenght) {
+	int i = 0, l = 0, count;
+	while (i <= unicode_length) {
+		if (utf8 != 0)
+			count = utf8_widechar_to_bytes(utf8 + l, utf8_lenght - l, unicode[i]);
+		else
+			count = utf8_widechar_to_bytes(0, 0, unicode[i]);
+		if (count <= 0)
+			return count;
+		l += count;
+		i++;
+	}
+	if (utf8 != 0 && l < utf8_lenght)
+		utf8[l] = 0;
+	return l;
+}
+int String::utf8_to_unicode(const char* utf8, int utf8_lenght, wchar_t *unicode,
+		int unicode_length) {
+	unsigned int c;
+	int count, i = 0, j = 0;
+	while (j < utf8_lenght) {
+		count = utf8_bytes_to_widechar(&utf8[j], utf8_lenght - j, &c);
+		if (count < 0)
+			return count;
+		if (unicode != 0 && i < unicode_length)
+			unicode[i] = c;
+		j += count;
+		i++;
+	}
+	if (unicode != 0 && i < unicode_length)
+		unicode[i] = 0;
+	return i;
+}
+String String::fromUnicode(const wchar_t* wchar, int length) {
+}
+
+String String::fromUTF8(const char* str, int length) {
+}
+
+String String::fromASCII(const char* str, int length) {
+}
+
+int String::toUnicode(const wchar_t* wchar, int length) {
+}
+
+wchar_t* String::toUnicode() {
+}
 } /* namespace pwt */
+
+

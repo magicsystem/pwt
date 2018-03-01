@@ -12,6 +12,11 @@ Frame::Frame() {
 }
 
 Frame::~Frame() {
+	FramePeer* peer = getFramePeer();
+	if (peer != 0) {
+		peer->dispose(this);
+		this->peer = 0;
+	}
 }
 
 WindowPeer* pwt::Frame::getWindowPeer() {
@@ -32,8 +37,8 @@ FramePeer* pwt::Frame::getFramePeer() {
 
 void Frame::create() {
 	FramePeer* peer = Toolkit::getDefaultToolkit()->getFramePeer();
-	peer->create(this, (Container*) 0);
 	this->peer = peer;
+	peer->create(this, (Container*) 0);
 }
 
 const char* Frame::getTitle() {

@@ -13,7 +13,7 @@ namespace pwt {
 class ComponentPeer;
 class Container;
 class Toolkit;
-class Component: public PlatformObject {
+class PUBLIC Component: public PlatformObject {
 protected:
 	void* peer;
 private:
@@ -36,6 +36,7 @@ public:
 	void setBounds(int x, int y, int width, int height);
 	Toolkit* getToolkit();
 protected:
+	virtual void postPlatformEvent(PlatformEvent* e);
 	virtual void postEvent(Event* e);
 	virtual void processEvent(Event& e);
 	virtual void processComponentEvent(ComponentEvent& e);

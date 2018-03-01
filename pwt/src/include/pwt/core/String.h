@@ -99,6 +99,12 @@ public:
 	}
 	String substring(int beginIndex, int endIndex);
 public:
+	static int utf8_bytes_to_widechar(const char* str, int length, unsigned int *pwc);
+	static int utf8_widechar_to_bytes(char* s, int length, unsigned int wc);
+	static int utf8_from_unicode(const wchar_t *unicode, int unicode_length, char* utf8,
+			int utf8_lenght);
+	static int utf8_to_unicode(const char* utf8, int utf8_lenght, wchar_t *unicode,
+			int unicode_length);
 	static String fromUnicode(const wchar_t* wchar, int length);
 	static String fromUTF8(const char* str, int length);
 	static String fromASCII(const char* str, int length);

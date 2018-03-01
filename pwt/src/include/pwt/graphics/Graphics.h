@@ -33,7 +33,7 @@ struct LineAttributes {
 	unsigned miterLimit :16;
 	ArrayObject<float>* dash;
 };
-class Graphics: public PlatformObject {
+class PUBLIC Graphics: public PlatformObject {
 private:
 	void* handles[10];
 	Ptr<Font> font;

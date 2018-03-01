@@ -9,7 +9,7 @@
 #define INCLUDE_PWT_WIDGETS_TOOLKIT_H_
 #include "Peer.h"
 namespace pwt {
-class Toolkit {
+class PUBLIC Toolkit {
 public:
 	virtual ~Toolkit();
 	static Toolkit* getSystemToolkit();

@@ -21,7 +21,11 @@ ContainerPeer* Container::getContainerPeer() {
 }
 
 Container::~Container() {
-	// TODO Auto-generated destructor stub
+	ContainerPeer* peer = getContainerPeer();
+	if (peer != 0) {
+		peer->dispose(this);
+		this->peer = 0;
+	}
 }
 void Container::add(Component* c) {
 	if (c != 0) {

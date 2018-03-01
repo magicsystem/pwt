@@ -7,9 +7,9 @@
 
 #ifndef INCLUDE_PWT_GRAPHICS_COLOR_H_
 #define INCLUDE_PWT_GRAPHICS_COLOR_H_
-
+#include "../core/core.h"
 namespace pwt {
-class Color {
+class PUBLIC Color {
 public:
 	enum {
 		white = 0xFFFFFFFF,

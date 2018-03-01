@@ -10,7 +10,7 @@
 #include "Component.h"
 namespace pwt {
 class ButtonPeer;
-class Button: public Component {
+class PUBLIC Button: public Component {
 private:
 	const char* label;
 protected:

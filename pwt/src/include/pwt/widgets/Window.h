@@ -10,7 +10,7 @@
 #include "Container.h"
 namespace pwt {
 class WindowPeer;
-class Window: public Container {
+class PUBLIC Window: public Container {
 protected:
 	virtual WindowPeer* getWindowPeer();
 	ContainerPeer* getContainerPeer();

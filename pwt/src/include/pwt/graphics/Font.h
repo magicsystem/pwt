@@ -10,7 +10,7 @@
 #include "../core/core.h"
 namespace pwt {
 
-class Font: public PlatformObject {
+class PUBLIC Font: public PlatformObject {
 private:
 	void* handles[2];
 public:

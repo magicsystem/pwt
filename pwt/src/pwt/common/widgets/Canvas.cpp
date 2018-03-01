@@ -13,6 +13,11 @@ Canvas::Canvas() {
 }
 
 Canvas::~Canvas() {
+	CanvasPeer* peer = getCanvasPeer();
+	if (peer != 0) {
+		peer->dispose(this);
+		this->peer = 0;
+	}
 }
 ComponentPeer* Canvas::getComponentPeer() {
 	return getCanvasPeer();
