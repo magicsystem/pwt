@@ -21,7 +21,7 @@ private:
 	void* handles[5];
 protected:
 	Component();
-	virtual ComponentPeer* getComponentPeer()=0;
+	virtual ComponentPeer* getComponentPeer();
 public:
 	virtual ~Component();
 	virtual void create(Container* parent);
@@ -45,6 +45,17 @@ protected:
 	virtual void processMouseEvent(MouseEvent& e);
 	virtual void processMouseMotionEvent(MouseEvent& e);
 	virtual void processMouseWheelEvent(MouseWheelEvent& e);
+	virtual void processPaintEvent(PaintEvent& e);
+protected:
+	virtual void paint(Graphics& g);
+	virtual void update(Graphics& g);
+	virtual void print(Graphics& g);
+public:
+	void repaint();
+	void repaint(Rectangle& r);
+	void repaint(int x, int y, int width, int height);
+	void getGraphics(Graphics& g);
+
 
 };
 }  // namespace pwt

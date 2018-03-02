@@ -15,9 +15,10 @@ struct GtkComponent_t {
 	GtkWidget* widget;
 	int state;
 };
-class pwt::NativeEvent {
+class pwt::PlatformEvent {
+public:
 	enum {
-		expose_event,
+		expose_event=1,
 		focus_in_event,
 		focus_out_event,
 		button_press_event,
@@ -33,6 +34,7 @@ class pwt::NativeEvent {
 	GtkWidget *widget;
 	void* event;
 	pwt::Component* c;
+	int result;
 };
 guint cp_gtk_awt_keycode_to_keysym(int keyCode, int keyLocation);
 class GtkComponentPeer: public virtual pwt::ComponentPeer {
@@ -51,21 +53,28 @@ public:
 	void setVisible(pwt::Component* c,bool b);
 	void setBounds(pwt::Component* c,pwt::Rectangle& r);
 	void getBounds(pwt::Component* c, pwt::Rectangle& r);
+	void paint(pwt::Component* c,pwt::Graphics& g);
+	void update(pwt::Component* c,pwt::Graphics& g);
+	void print(pwt::Component* c,pwt::Graphics& g);
+	void repaint(pwt::Component* c);
+	void repaint(pwt::Component* c,pwt::Rectangle& r);
+	void getGraphics(pwt::Component* c,pwt::Graphics& g);
+public:
 	void postEvent(pwt::Component* c,pwt::Event* e);
-	void postNativeEvent(pwt::Component* c, pwt::NativeEvent* e);
+	void postPlatformEvent(pwt::Component* c, pwt::PlatformEvent* e);
 	void connect_expose_signals(pwt::Component* c);
 	void connect_focus_signals(pwt::Component* c);
 	void connect_mouse_signals(pwt::Component* c);
 	void connectSignals(pwt::Component* c);
-	virtual void expose_event(pwt::NativeEvent* e);
-	virtual void focus_in_event(pwt::NativeEvent* e);
-	virtual void focus_out_event(pwt::NativeEvent* e);
-	virtual void button_press_event(pwt::NativeEvent* e);
-	virtual void button_release_event(pwt::NativeEvent* e);
-	virtual void enter_notify_event(pwt::NativeEvent* e);
-	virtual void leave_notify_event(pwt::NativeEvent* e);
-	virtual void motion_notify_event(pwt::NativeEvent* e);
-	virtual void scroll_event(pwt::NativeEvent* e);
+	virtual void expose_event(pwt::PlatformEvent* e);
+	virtual void focus_in_event(pwt::PlatformEvent* e);
+	virtual void focus_out_event(pwt::PlatformEvent* e);
+	virtual void button_press_event(pwt::PlatformEvent* e);
+	virtual void button_release_event(pwt::PlatformEvent* e);
+	virtual void enter_notify_event(pwt::PlatformEvent* e);
+	virtual void leave_notify_event(pwt::PlatformEvent* e);
+	virtual void motion_notify_event(pwt::PlatformEvent* e);
+	virtual void scroll_event(pwt::PlatformEvent* e);
 };
 #endif
 #endif /* PWT_GTK_WIDGETS_GTKCOMPONENTPEER_H_ */

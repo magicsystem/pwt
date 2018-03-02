@@ -29,7 +29,11 @@ GtkToolkit* GtkToolkit::getGtkToolkit() {
 }
 GtkToolkit::GtkToolkit() {
 	this->group = 0;
-
+	this->click_count = 1;
+	this->button_click_time = 0;
+	this->button_window = NULL;
+	this->button_number_direction = -1;
+	this->hasBeenDragged = 0;
 }
 
 GtkToolkit::~GtkToolkit() {

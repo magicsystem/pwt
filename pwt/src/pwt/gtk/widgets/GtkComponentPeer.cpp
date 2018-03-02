@@ -9,13 +9,15 @@
 #ifdef __linux
 #include "../graphics/graphics.h"
 #include "GtkContainerPeer.h"
+#include "GtkToolkit.h"
 using namespace pwt;
 /* FIXME: use gtk-double-click-time, gtk-double-click-distance */
 #define MULTI_CLICK_TIME   250
 static int button_to_awt_mods(int button) {
 	switch (button) {
 	case 1:
-		return pwt::MouseEvent::BUTTON1_DOWN_MASK | pwt::MouseEvent::BUTTON1_MASK;
+		return pwt::MouseEvent::BUTTON1_DOWN_MASK
+				| pwt::MouseEvent::BUTTON1_MASK;
 	case 2:
 		return MouseEvent::BUTTON2_DOWN_MASK | MouseEvent::BUTTON2_MASK;
 	case 3:
@@ -25,7 +27,7 @@ static int button_to_awt_mods(int button) {
 	return 0;
 }
 
-int cp_gtk_state_to_awt_mods(guint state) {
+int gtk_get_modifier(guint state) {
 	int result = 0;
 
 	if (state & GDK_SHIFT_MASK)
@@ -56,351 +58,105 @@ static int state_to_awt_mods_with_button_states(guint state) {
 
 	return result;
 }
-/* These variables are used to keep track of click counts.  The AWT
- allows more than a triple click to occur but GTK doesn't report
- more-than-triple clicks.  Also used for keeping track of scroll events.*/
-static int click_count = 1;
-static int button_click_time = 0;
-static GdkWindow *button_window = NULL;
-static guint button_number_direction = -1;
-static int hasBeenDragged;
 static gboolean component_button_press_cb(GtkWidget *widget,
 		GdkEventButton *event, Component* c) {
-	/* Ignore double and triple click events. */
-	if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS)
-		return FALSE;
-
-	MouseEvent e;
-
-	if ((event->time < (button_click_time + MULTI_CLICK_TIME))
-			&& (event->window == button_window)
-			&& (event->button == button_number_direction))
-		click_count++;
-	else
-		click_count = 1;
-
-	button_click_time = event->time;
-	button_window = event->window;
-	button_number_direction = event->button;
-
-	e.nativeEvent = (NativeEvent*) event;
-	e.clazz = Event::MOUSE_EVENT;
-	e.type = MouseEvent::MOUSE_PRESSED;
-	e.when = event->time;
-	e.modifiers = cp_gtk_state_to_awt_mods(event->state)
-			| button_to_awt_mods(event->button);
-	e.x = event->x;
-	e.y = event->y;
-	e.clickCount = click_count;
-	e.popupTrigger = (event->button == 3) ? true : false;
-	e.source = c;
-	e.button = event->button;
-
-	/*	  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
-	 postMouseEventID,
-	 AWT_MOUSE_PRESSED,
-	 (jlong)event->time,
-	 cp_gtk_state_to_awt_mods (event->state)
-	 | button_to_awt_mods (event->button),
-	 (jint)event->x,
-	 (jint)event->y,
-	 click_count,
-	 (event->button == 3) ? JNI_TRUE :
-	 JNI_FALSE);*/
-	ComponentPeer::sendEvent(c,&e);
-
-	hasBeenDragged = false;
-
-	return false;
-
+	pwt::PlatformEvent e;
+	e.c = c;
+	e.event = event;
+	e.msg = pwt::PlatformEvent::button_press_event;
+	e.widget = widget;
+	e.result = FALSE;
+	ComponentPeer::sendPlatformEvent(c, &e);
+	return e.result;
 }
 static gboolean component_button_release_cb(GtkWidget *widget,
 		GdkEventButton *event, Component* c) {
-	int width, height;
-	MouseEvent e;
-	e.nativeEvent = (NativeEvent*) event;
-	e.source = c;
-	e.clazz = Event::MOUSE_EVENT;
-	e.type = MouseEvent::MOUSE_RELEASED;
-	e.when = event->time;
-	e.modifiers = cp_gtk_state_to_awt_mods(event->state)
-			| button_to_awt_mods(event->button);
-	e.x = event->x;
-	e.y = event->y;
-	e.clickCount = click_count;
-	e.popupTrigger = false;
-	e.button = event->button;
-	ComponentPeer::sendEvent(c,&e);
-
-	/*	(*cp_gtk_gdk_env())->CallVoidMethod(cp_gtk_gdk_env(), peer,
-	 postMouseEventID,
-	 AWT_MOUSE_RELEASED, (jlong) event->time,
-	 cp_gtk_state_to_awt_mods(event->state)
-	 | button_to_awt_mods(event->button), (jint) event->x,
-	 (jint) event->y, click_count, JNI_FALSE);*/
-
-	/* Generate an AWT click event only if the release occured in the
-	 window it was pressed in, and the mouse has not been dragged since
-	 the last time it was pressed. */
-	gdk_drawable_get_size(event->window, &width, &height);
-	if (!hasBeenDragged && event->x >= 0 && event->y >= 0 && event->x <= width
-			&& event->y <= height) {
-		e.nativeEvent = (NativeEvent*) event;
-		e.source = c;
-		e.clazz = Event::MOUSE_EVENT;
-		e.type = MouseEvent::MOUSE_CLICKED;
-		e.when = event->time;
-		e.modifiers = cp_gtk_state_to_awt_mods(event->state)
-				| button_to_awt_mods(event->button);
-		e.x = event->x;
-		e.y = event->y;
-		e.clickCount = click_count;
-		e.popupTrigger = false;
-		e.button = event->button;
-		ComponentPeer::sendEvent(c,&e);
-		/*		(*cp_gtk_gdk_env())->CallVoidMethod(cp_gtk_gdk_env(), peer,
-		 postMouseEventID,
-		 AWT_MOUSE_CLICKED, (jlong) event->time,
-		 cp_gtk_state_to_awt_mods(event->state)
-		 | button_to_awt_mods(event->button), (jint) event->x,
-		 (jint) event->y, click_count, JNI_FALSE);*/
-	}
-	return FALSE;
-
+	pwt::PlatformEvent e;
+	e.c = c;
+	e.event = event;
+	e.msg = pwt::PlatformEvent::button_release_event;
+	e.widget = widget;
+	e.result = FALSE;
+	ComponentPeer::sendPlatformEvent(c, &e);
+	return e.result;
 }
 static gboolean component_motion_notify_cb(GtkWidget *widget,
 		GdkEventMotion *event, Component* c) {
-	MouseEvent e;
-	if (event->state
-			& (GDK_BUTTON1_MASK | GDK_BUTTON2_MASK | GDK_BUTTON3_MASK
-					| GDK_BUTTON4_MASK | GDK_BUTTON5_MASK)) {
-		e.nativeEvent = (NativeEvent*) event;
-		e.source = c;
-		e.clazz = Event::MOUSE_EVENT;
-		e.type = MouseEvent::MOUSE_DRAGGED;
-		e.when = event->time;
-		e.modifiers = state_to_awt_mods_with_button_states(event->state);
-		e.x = event->x;
-		e.y = event->y;
-		e.clickCount = 0;
-		e.popupTrigger = false;
-		e.button = 0;
-		ComponentPeer::sendEvent(c,&e);
-		/*	      (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
-		 postMouseEventID,
-		 AWT_MOUSE_DRAGGED,
-		 (jlong)event->time,
-		 state_to_awt_mods_with_button_states (event->state),
-		 (jint)event->x,
-		 (jint)event->y,
-		 0,
-		 JNI_FALSE);*/
-
-		hasBeenDragged = TRUE;
-	} else {
-		e.nativeEvent = (NativeEvent*) event;
-		e.source = c;
-		e.clazz = Event::MOUSE_EVENT;
-		e.type = MouseEvent::MOUSE_MOVED;
-		e.when = event->time;
-		e.modifiers = cp_gtk_state_to_awt_mods(event->state);
-		e.x = event->x;
-		e.y = event->y;
-		e.clickCount = 0;
-		e.popupTrigger = false;
-		e.button = 0;
-		ComponentPeer::sendEvent(c,&e);
-		/*	      (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer, postMouseEventID,
-		 AWT_MOUSE_MOVED,
-		 (jlong)event->time,
-		 cp_gtk_state_to_awt_mods (event->state),
-		 (jint)event->x,
-		 (jint)event->y,
-		 0,
-		 JNI_FALSE);*/
-	}
-	return FALSE;
-
+	pwt::PlatformEvent e;
+	e.c = c;
+	e.event = event;
+	e.msg = pwt::PlatformEvent::motion_notify_event;
+	e.widget = widget;
+	e.result = FALSE;
+	ComponentPeer::sendPlatformEvent(c, &e);
+	return e.result;
 }
 static gboolean component_scroll_cb(GtkWidget *widget, GdkEventScroll *event,
 		Component* c) {
-	int rotation;
-	MouseWheelEvent e;
-	/** Record click count for specific direction. */
-	if ((event->time < (button_click_time + MULTI_CLICK_TIME))
-			&& (event->window == button_window)
-			&& (event->direction == button_number_direction))
-		click_count++;
-	else
-		click_count = 1;
-
-	button_click_time = event->time;
-	button_window = event->window;
-	button_number_direction = event->direction;
-
-	if (event->direction == GDK_SCROLL_UP
-			|| event->direction == GDK_SCROLL_LEFT)
-		rotation = -1;
-	else
-		rotation = 1;
-
-	e.nativeEvent = (NativeEvent*) event;
-	e.source = c;
-	e.clazz = Event::MOUSE_WHEEL_EVENT;
-	e.type = MouseWheelEvent::MOUSE_WHEEL;
-	e.when = event->time;
-	e.modifiers = cp_gtk_state_to_awt_mods(event->state);
-	e.x = event->x;
-	e.y = event->y;
-	e.clickCount = click_count;
-	e.popupTrigger = false;
-	e.button = 0;
-	e.scrollType = MouseWheelEvent::WHEEL_UNIT_SCROLL;
-	e.scrollAmount = 1;
-	e.wheelRotation = rotation;
-	e.preciseWheelRotation = rotation;
-	ComponentPeer::sendEvent(c,&e);
-
-	/*	  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
-	 postMouseWheelEventID,
-	 AWT_MOUSE_WHEEL,
-	 (jlong)event->time,
-	 cp_gtk_state_to_awt_mods (event->state),
-	 (jint)event->x,
-	 (jint)event->y,
-	 click_count,
-	 JNI_FALSE,
-	 AWT_WHEEL_UNIT_SCROLL,
-	 1  amount ,
-	 rotation);*/
-	return FALSE;
-
+	pwt::PlatformEvent e;
+	e.c = c;
+	e.event = event;
+	e.msg = pwt::PlatformEvent::scroll_event;
+	e.widget = widget;
+	e.result = FALSE;
+	ComponentPeer::sendPlatformEvent(c, &e);
+	return e.result;
 }
 static gboolean component_enter_notify_cb(GtkWidget *widget,
 		GdkEventCrossing *event, Component* c) {
-	/* We are not interested in enter events that are due to
-	 grab/ungrab and not to actually crossing boundaries */
-	if (event->mode == GDK_CROSSING_NORMAL) {
-		MouseEvent e;
-		e.nativeEvent = (NativeEvent*) event;
-		e.source = c;
-		e.clazz = Event::MOUSE_EVENT;
-		e.type = MouseEvent::MOUSE_ENTERED;
-		e.when = event->time;
-		e.modifiers = state_to_awt_mods_with_button_states(event->state);
-		e.x = event->x;
-		e.y = event->y;
-		e.clickCount = 0;
-		e.popupTrigger = false;
-		e.button = 0;
-		ComponentPeer::sendEvent(c,&e);
-		/*	      (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer, postMouseEventID,
-		 AWT_MOUSE_ENTERED,
-		 (jlong)event->time,
-		 state_to_awt_mods_with_button_states (event->state),
-		 (jint)event->x,
-		 (jint)event->y,
-		 0,
-		 JNI_FALSE);*/
-	}
-	return FALSE;
-
+	pwt::PlatformEvent e;
+	e.c = c;
+	e.event = event;
+	e.msg = pwt::PlatformEvent::enter_notify_event;
+	e.widget = widget;
+	e.result = FALSE;
+	ComponentPeer::sendPlatformEvent(c, &e);
+	return e.result;
 }
 static gboolean component_leave_notify_cb(GtkWidget *widget,
 		GdkEventCrossing *event, Component* c) {
-	/* We are not interested in leave events that are due to
-	 grab/ungrab and not to actually crossing boundaries */
-	if (event->mode == GDK_CROSSING_NORMAL) {
-		MouseEvent e;
-		e.nativeEvent = (NativeEvent*) event;
-		e.source = c;
-		e.clazz = Event::MOUSE_EVENT;
-		e.type = MouseEvent::MOUSE_EXITED;
-		e.when = event->time;
-		e.modifiers = state_to_awt_mods_with_button_states(event->state);
-		e.x = event->x;
-		e.y = event->y;
-		e.clickCount = 0;
-		e.popupTrigger = false;
-		e.button = 0;
-		ComponentPeer::sendEvent(c,&e);
-		/*	      (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
-		 postMouseEventID,
-		 AWT_MOUSE_EXITED,
-		 (jlong)event->time,
-		 state_to_awt_mods_with_button_states (event->state),
-		 (jint)event->x,
-		 (jint)event->y,
-		 0,
-		 JNI_FALSE);*/
-	}
-	return FALSE;
-
+	pwt::PlatformEvent e;
+	e.c = c;
+	e.event = event;
+	e.msg = pwt::PlatformEvent::leave_notify_event;
+	e.widget = widget;
+	e.result = FALSE;
+	ComponentPeer::sendPlatformEvent(c, &e);
+	return e.result;
 }
 static gboolean component_expose_cb(GtkWidget *widget, GdkEventExpose *event,
 		Component* c) {
-	PaintEvent e;
-	Graphics gc;
-	Graphics_t* t = gc.getHandles<Graphics_t>();
-	t->c = c;
-	t->drawable = event->window;
-	e.nativeEvent = (NativeEvent*) event;
-	e.source = c;
-	e.clazz = Event::PAINT_EVENT;
-	e.type = PaintEvent::PAINT;
-	e.updateRect.x = event->area.x;
-	e.updateRect.y = event->area.y;
-	e.updateRect.width = event->area.width;
-	e.updateRect.height = event->area.height;
-	e.gc = &gc;
-	ComponentPeer::sendEvent(c,&e);
-
-	/*	 (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
-	 postExposeEventID,
-	 (jint)event->area.x,
-	 (jint)event->area.y,
-	 (jint)event->area.width,
-	 (jint)event->area.height);*/
-
-	return FALSE;
-
+	pwt::PlatformEvent e;
+	e.c = c;
+	e.event = event;
+	e.msg = pwt::PlatformEvent::expose_event;
+	e.widget = widget;
+	e.result = FALSE;
+	ComponentPeer::sendPlatformEvent(c, &e);
+	return e.result;
 }
 static gboolean component_focus_in_cb(GtkWidget *widget, GdkEventFocus *event,
 		Component* c) {
-	FocusEvent e;
-	e.nativeEvent = (NativeEvent*) event;
-	e.source = c;
-	e.clazz = Event::FOCUS_EVENT;
-	e.type = FocusEvent::FOCUS_GAINED;
-	e.opposite = 0;
-	e.temporary = false;
-	ComponentPeer::sendEvent(c,&e);
-
-	/*	  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
-	 postFocusEventID,
-	 AWT_FOCUS_GAINED,
-	 JNI_FALSE);*/
-
-	return FALSE;
+	pwt::PlatformEvent e;
+	e.c = c;
+	e.event = event;
+	e.msg = pwt::PlatformEvent::focus_in_event;
+	e.widget = widget;
+	e.result = FALSE;
+	ComponentPeer::sendPlatformEvent(c, &e);
+	return e.result;
 
 }
 static gboolean component_focus_out_cb(GtkWidget *widget, GdkEventFocus *event,
 		Component* c) {
-	FocusEvent e;
-	e.nativeEvent = (NativeEvent*) event;
-	e.source = c;
-	e.clazz = Event::FOCUS_EVENT;
-	e.type = FocusEvent::FOCUS_LOST;
-	e.opposite = 0;
-	e.temporary = false;
-	ComponentPeer::sendEvent(c,&e);
-	/*	  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
-	 postFocusEventID,
-	 AWT_FOCUS_LOST,
-	 JNI_FALSE);*/
-
-	return FALSE;
-
+	pwt::PlatformEvent e;
+	e.c = c;
+	e.event = event;
+	e.msg = pwt::PlatformEvent::focus_out_event;
+	e.widget = widget;
+	e.result = FALSE;
+	ComponentPeer::sendPlatformEvent(c, &e);
+	return e.result;
 }
 
 GtkComponentPeer::GtkComponentPeer() {
@@ -461,8 +217,40 @@ void GtkComponentPeer::getBounds(Component* c, Rectangle& r) {
 	r.width = alloc.width;
 	r.height = alloc.height;
 }
+void GtkComponentPeer::getGraphics(pwt::Component* c, pwt::Graphics& gc) {
+	GtkComponent_t* t1 = (GtkComponent_t*) getReserved(c);
+	Graphics_t* t = gc.getHandles<Graphics_t>();
+	t->c = c;
+	t->drawable = gtk_widget_get_window(t1->widget);
+}
+
+void GtkComponentPeer::paint(pwt::Component* c, pwt::Graphics& g) {
+}
+
+void GtkComponentPeer::update(pwt::Component* c, pwt::Graphics& g) {
+}
+
+void GtkComponentPeer::print(pwt::Component* c, pwt::Graphics& g) {
+}
+
+void GtkComponentPeer::repaint(pwt::Component* c) {
+	GtkComponent_t* t = (GtkComponent_t*) getReserved(c);
+	gtk_widget_queue_draw(t->widget);
+}
+
+void GtkComponentPeer::repaint(pwt::Component* c, pwt::Rectangle& r) {
+	GtkComponent_t* t = (GtkComponent_t*) getReserved(c);
+	gtk_widget_queue_draw_area(t->widget, r.x, r.y, r.width, r.height);
+}
 
 void GtkComponentPeer::postEvent(Component* c, Event* e) {
+	switch (e->clazz) {
+	case Event::PAINT_EVENT:
+		ComponentPeer::paint(c, ((PaintEvent*) e)->gc);
+		break;
+	default:
+		break;
+	}
 }
 
 void GtkComponentPeer::connect_expose_signals(Component* c) {
@@ -505,14 +293,15 @@ void GtkComponentPeer::connect_mouse_signals(Component* c) {
 }
 
 void GtkComponentPeer::addWidget(Container* parent, GtkWidget* widget) {
-	GtkComponent_t *t_p;
-	GtkContainerPeer* peer = dynamic_cast<GtkContainerPeer*> (getPeer(parent));
-	peer->add(parent,widget);
+	//GtkComponent_t *t_p;
+	GtkContainerPeer* peer = dynamic_cast<GtkContainerPeer*>(getPeer(parent));
+	peer->add(parent, widget);
 }
 
-void GtkComponentPeer::add(Component* c,GtkWidget* widget) {
+void GtkComponentPeer::add(Component* c, GtkWidget* widget) {
 	GtkComponent_t* t = (GtkComponent_t*) getReserved(c);
-	if(t->widget == 0) return;
+	if (t->widget == 0)
+		return;
 	gtk_container_add(GTK_CONTAINER(t->widget), widget);
 }
 
@@ -522,34 +311,326 @@ void GtkComponentPeer::connectSignals(Component* c) {
 	connect_mouse_signals(c);
 }
 
-void GtkComponentPeer::postNativeEvent(pwt::Component* c, pwt::NativeEvent* e) {
+void GtkComponentPeer::postPlatformEvent(pwt::Component* c,
+		pwt::PlatformEvent* e) {
+	switch (e->msg) {
+	case pwt::PlatformEvent::expose_event:
+		expose_event(e);
+		break;
+	case pwt::PlatformEvent::focus_in_event:
+		focus_in_event(e);
+		break;
+	case pwt::PlatformEvent::focus_out_event:
+		focus_out_event(e);
+		break;
+	case pwt::PlatformEvent::button_press_event:
+		button_press_event(e);
+		break;
+	case pwt::PlatformEvent::button_release_event:
+		button_release_event(e);
+		break;
+	case pwt::PlatformEvent::enter_notify_event:
+		enter_notify_event(e);
+		break;
+	case pwt::PlatformEvent::leave_notify_event:
+		leave_notify_event(e);
+		break;
+	case pwt::PlatformEvent::motion_notify_event:
+		motion_notify_event(e);
+		break;
+	case pwt::PlatformEvent::scroll_event:
+		scroll_event(e);
+		break;
+	}
 }
 
-void GtkComponentPeer::expose_event(pwt::NativeEvent* e) {
+void GtkComponentPeer::expose_event(pwt::PlatformEvent* e) {
+	PaintEvent ee;
+	GdkEventExpose *event = (GdkEventExpose*) e->event;
+	Graphics gc;
+	Graphics_t* t = gc.getHandles<Graphics_t>();
+	t->c = e->c;
+	t->drawable = event->window;
+	ee.nativeEvent = (PlatformEvent*) event;
+	ee.source = e->c;
+	ee.clazz = Event::PAINT_EVENT;
+	ee.type = PaintEvent::PAINT;
+	ee.updateRect.x = event->area.x;
+	ee.updateRect.y = event->area.y;
+	ee.updateRect.width = event->area.width;
+	ee.updateRect.height = event->area.height;
+	ee.gc = &gc;
+	ComponentPeer::sendEvent(e->c, &ee);
 }
 
-void GtkComponentPeer::focus_in_event(pwt::NativeEvent* e) {
+void GtkComponentPeer::focus_in_event(pwt::PlatformEvent* e) {
+	FocusEvent ee;
+	ee.nativeEvent = e;
+	ee.source = e->c;
+	ee.clazz = Event::FOCUS_EVENT;
+	ee.type = FocusEvent::FOCUS_GAINED;
+	ee.opposite = 0;
+	ee.temporary = false;
+	ComponentPeer::sendEvent(e->c, &ee);
 }
 
-void GtkComponentPeer::focus_out_event(pwt::NativeEvent* e) {
+void GtkComponentPeer::focus_out_event(pwt::PlatformEvent* e) {
+	FocusEvent ee;
+	ee.nativeEvent = e;
+	ee.source = e->c;
+	ee.clazz = Event::FOCUS_EVENT;
+	ee.type = FocusEvent::FOCUS_LOST;
+	ee.opposite = 0;
+	ee.temporary = false;
+	ComponentPeer::sendEvent(e->c, &ee);
 }
 
-void GtkComponentPeer::button_press_event(pwt::NativeEvent* e) {
+void GtkComponentPeer::button_press_event(pwt::PlatformEvent* e) {
+	/* Ignore double and triple click events. */
+	GdkEventButton *event = (GdkEventButton*) e->event;
+	if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {
+		e->result = FALSE;
+		return;
+	}
+
+	MouseEvent ee;
+	GtkToolkit* toolkit = GtkToolkit::getGtkToolkit();
+
+	if ((event->time < (toolkit->button_click_time + MULTI_CLICK_TIME))
+			&& (event->window == toolkit->button_window)
+			&& (event->button == toolkit->button_number_direction))
+		toolkit->click_count++;
+	else
+		toolkit->click_count = 1;
+
+	toolkit->button_click_time = event->time;
+	toolkit->button_window = event->window;
+	toolkit->button_number_direction = event->button;
+
+	ee.nativeEvent = (PlatformEvent*) event;
+	ee.clazz = Event::MOUSE_EVENT;
+	ee.type = MouseEvent::MOUSE_PRESSED;
+	ee.when = event->time;
+	ee.modifiers = gtk_get_modifier(event->state)
+			| button_to_awt_mods(event->button);
+	ee.x = event->x;
+	ee.y = event->y;
+	ee.clickCount = toolkit->click_count;
+	ee.popupTrigger = (event->button == 3) ? true : false;
+	ee.source = e->c;
+	ee.button = event->button;
+
+	/*	  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
+	 postMouseEventID,
+	 AWT_MOUSE_PRESSED,
+	 (jlong)event->time,
+	 cp_gtk_state_to_awt_mods (event->state)
+	 | button_to_awt_mods (event->button),
+	 (jint)event->x,
+	 (jint)event->y,
+	 click_count,
+	 (event->button == 3) ? JNI_TRUE :
+	 JNI_FALSE);*/
+	ComponentPeer::sendEvent(e->c, &ee);
+
+	toolkit->hasBeenDragged = false;
+
+	e->result = false;
 }
 
-void GtkComponentPeer::button_release_event(pwt::NativeEvent* e) {
+void GtkComponentPeer::button_release_event(pwt::PlatformEvent* e) {
+	int width, height;
+	GdkEventButton *event = (GdkEventButton*) e->event;
+	GtkToolkit* toolkit = GtkToolkit::getGtkToolkit();
+	MouseEvent ee;
+	ee.nativeEvent = e;
+	ee.source = e->c;
+	ee.clazz = Event::MOUSE_EVENT;
+	ee.type = MouseEvent::MOUSE_RELEASED;
+	ee.when = event->time;
+	ee.modifiers = gtk_get_modifier(event->state)
+			| button_to_awt_mods(event->button);
+	ee.x = event->x;
+	ee.y = event->y;
+	ee.clickCount = toolkit->click_count;
+	ee.popupTrigger = false;
+	ee.button = event->button;
+	ComponentPeer::sendEvent(e->c, &ee);
+
+	/*	(*cp_gtk_gdk_env())->CallVoidMethod(cp_gtk_gdk_env(), peer,
+	 postMouseEventID,
+	 AWT_MOUSE_RELEASED, (jlong) event->time,
+	 cp_gtk_state_to_awt_mods(event->state)
+	 | button_to_awt_mods(event->button), (jint) event->x,
+	 (jint) event->y, click_count, JNI_FALSE);*/
+
+	/* Generate an AWT click event only if the release occured in the
+	 window it was pressed in, and the mouse has not been dragged since
+	 the last time it was pressed. */
+	gdk_drawable_get_size(event->window, &width, &height);
+	if (!toolkit->hasBeenDragged && event->x >= 0 && event->y >= 0
+			&& event->x <= width && event->y <= height) {
+		ee.nativeEvent = (PlatformEvent*) event;
+		ee.source = e->c;
+		ee.clazz = Event::MOUSE_EVENT;
+		ee.type = MouseEvent::MOUSE_CLICKED;
+		ee.when = event->time;
+		ee.modifiers = gtk_get_modifier(event->state)
+				| button_to_awt_mods(event->button);
+		ee.x = event->x;
+		ee.y = event->y;
+		ee.clickCount = toolkit->click_count;
+		ee.popupTrigger = false;
+		ee.button = event->button;
+		ComponentPeer::sendEvent(e->c, &ee);
+		/*		(*cp_gtk_gdk_env())->CallVoidMethod(cp_gtk_gdk_env(), peer,
+		 postMouseEventID,
+		 AWT_MOUSE_CLICKED, (jlong) event->time,
+		 cp_gtk_state_to_awt_mods(event->state)
+		 | button_to_awt_mods(event->button), (jint) event->x,
+		 (jint) event->y, click_count, JNI_FALSE);*/
+	}
+	e->result = FALSE;
 }
 
-void GtkComponentPeer::enter_notify_event(pwt::NativeEvent* e) {
+void GtkComponentPeer::enter_notify_event(pwt::PlatformEvent* e) {
+	/* We are not interested in enter events that are due to
+	 grab/ungrab and not to actually crossing boundaries */
+	GdkEventCrossing *event = (GdkEventCrossing*) e->event;
+	if (event->mode == GDK_CROSSING_NORMAL) {
+		MouseEvent ee;
+		ee.nativeEvent = (PlatformEvent*) event;
+		ee.source = e->c;
+		ee.clazz = Event::MOUSE_EVENT;
+		ee.type = MouseEvent::MOUSE_ENTERED;
+		ee.when = event->time;
+		ee.modifiers = state_to_awt_mods_with_button_states(event->state);
+		ee.x = event->x;
+		ee.y = event->y;
+		ee.clickCount = 0;
+		ee.popupTrigger = false;
+		ee.button = 0;
+		ComponentPeer::sendEvent(e->c, &ee);
+	}
+	e->result = FALSE;
 }
 
-void GtkComponentPeer::leave_notify_event(pwt::NativeEvent* e) {
+void GtkComponentPeer::leave_notify_event(pwt::PlatformEvent* e) {
+	/* We are not interested in leave events that are due to
+	 grab/ungrab and not to actually crossing boundaries */
+	GdkEventCrossing *event = (GdkEventCrossing*) e->event;
+	if (event->mode == GDK_CROSSING_NORMAL) {
+		MouseEvent ee;
+		ee.nativeEvent = (PlatformEvent*) event;
+		ee.source = e->c;
+		ee.clazz = Event::MOUSE_EVENT;
+		ee.type = MouseEvent::MOUSE_EXITED;
+		ee.when = event->time;
+		ee.modifiers = state_to_awt_mods_with_button_states(event->state);
+		ee.x = event->x;
+		ee.y = event->y;
+		ee.clickCount = 0;
+		ee.popupTrigger = false;
+		ee.button = 0;
+		ComponentPeer::sendEvent(e->c, &ee);
+	}
+	e->result = FALSE;
 }
 
-void GtkComponentPeer::motion_notify_event(pwt::NativeEvent* e) {
-}
+void GtkComponentPeer::motion_notify_event(pwt::PlatformEvent* e) {
+	MouseEvent ee;
+	GdkEventMotion *event = (GdkEventMotion*) e->event;
+	if (event->state
+			& (GDK_BUTTON1_MASK | GDK_BUTTON2_MASK | GDK_BUTTON3_MASK
+					| GDK_BUTTON4_MASK | GDK_BUTTON5_MASK)) {
+		ee.nativeEvent = (PlatformEvent*) event;
+		ee.source = e->c;
+		ee.clazz = Event::MOUSE_EVENT;
+		ee.type = MouseEvent::MOUSE_DRAGGED;
+		ee.when = event->time;
+		ee.modifiers = state_to_awt_mods_with_button_states(event->state);
+		ee.x = event->x;
+		ee.y = event->y;
+		ee.clickCount = 0;
+		ee.popupTrigger = false;
+		ee.button = 0;
+		ComponentPeer::sendEvent(e->c, &ee);
+		/*	      (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
+		 postMouseEventID,
+		 AWT_MOUSE_DRAGGED,
+		 (jlong)event->time,
+		 state_to_awt_mods_with_button_states (event->state),
+		 (jint)event->x,
+		 (jint)event->y,
+		 0,
+		 JNI_FALSE);*/
 
-void GtkComponentPeer::scroll_event(pwt::NativeEvent* e) {
+		GtkToolkit::getGtkToolkit()->hasBeenDragged = TRUE;
+	} else {
+		ee.nativeEvent = (PlatformEvent*) event;
+		ee.source = e->c;
+		ee.clazz = Event::MOUSE_EVENT;
+		ee.type = MouseEvent::MOUSE_MOVED;
+		ee.when = event->time;
+		ee.modifiers = gtk_get_modifier(event->state);
+		ee.x = event->x;
+		ee.y = event->y;
+		ee.clickCount = 0;
+		ee.popupTrigger = false;
+		ee.button = 0;
+		ComponentPeer::sendEvent(e->c, &ee);
+		/*	      (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer, postMouseEventID,
+		 AWT_MOUSE_MOVED,
+		 (jlong)event->time,
+		 cp_gtk_state_to_awt_mods (event->state),
+		 (jint)event->x,
+		 (jint)event->y,
+		 0,
+		 JNI_FALSE);*/
+	}
+	e->result = FALSE;
+
+}
+void GtkComponentPeer::scroll_event(pwt::PlatformEvent* e) {
+	int rotation;
+	MouseWheelEvent ee;
+	GdkEventScroll *event = (GdkEventScroll*) e->event;
+	GtkToolkit* toolkit = GtkToolkit::getGtkToolkit();
+	/** Record click count for specific direction. */
+	if ((event->time < (toolkit->button_click_time + MULTI_CLICK_TIME))
+			&& (event->window == toolkit->button_window)
+			&& (event->direction == toolkit->button_number_direction))
+		toolkit->click_count++;
+	else
+		toolkit->click_count = 1;
+
+	toolkit->button_click_time = event->time;
+	toolkit->button_window = event->window;
+	toolkit->button_number_direction = event->direction;
+
+	if (event->direction == GDK_SCROLL_UP
+			|| event->direction == GDK_SCROLL_LEFT)
+		rotation = -1;
+	else
+		rotation = 1;
+
+	ee.nativeEvent = (PlatformEvent*) event;
+	ee.source = e->c;
+	ee.clazz = Event::MOUSE_WHEEL_EVENT;
+	ee.type = MouseWheelEvent::MOUSE_WHEEL;
+	ee.when = event->time;
+	ee.modifiers = gtk_get_modifier(event->state);
+	ee.x = event->x;
+	ee.y = event->y;
+	ee.clickCount = toolkit->click_count;
+	ee.popupTrigger = false;
+	ee.button = 0;
+	ee.scrollType = MouseWheelEvent::WHEEL_UNIT_SCROLL;
+	ee.scrollAmount = 1;
+	ee.wheelRotation = rotation;
+	ee.preciseWheelRotation = rotation;
+	ComponentPeer::sendEvent(e->c, &ee);
+	e->result = FALSE;
 }
 
 #endif

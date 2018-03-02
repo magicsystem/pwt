@@ -12,7 +12,7 @@
 
 namespace pwt {
 
-unsigned char String_empty[] = { 0, 1, 0 , 0 };
+unsigned char String_empty[] = { 0, 1, 0, 0 };
 
 String::String() {
 	this->chars = 0;
@@ -37,7 +37,7 @@ String::~String() {
 String::String(const char* str) {
 	if (str != 0) {
 		if (str[0] == 0) {
-			this->ref = (StringRef*)String_empty;
+			this->ref = (StringRef*) String_empty;
 			return;
 		}
 	}
@@ -53,7 +53,7 @@ void String::operator =(const char* str) {
 	}
 	if (str != 0) {
 		if (str[0] == 0) {
-			this->ref = (StringRef*)String_empty;
+			this->ref = (StringRef*) String_empty;
 			return;
 		}
 	}
@@ -125,6 +125,11 @@ String pwt::String::clone(IMem* mem) {
 	return ret;
 }
 
+String String::clone(const char* a, int length) {
+	String ret;
+	ret.copy(a, length);
+	return ret;
+}
 String::String(int beginIndex, int count, const char* str) {
 	copy(str + beginIndex, count - beginIndex);
 }
@@ -424,7 +429,8 @@ String String::substring(int beginIndex, int endIndex) {
 		return String(beginIndex, endIndex - beginIndex, this->getChars());
 	}
 }
-int String::utf8_bytes_to_widechar(const char* str, int length, unsigned int *pwc) {
+int String::utf8_bytes_to_widechar(const char* str, int length,
+		unsigned int *pwc) {
 	unsigned char c = str[0], *s = (unsigned char*) str;
 	if (str == 0 || length <= 0)
 		return 0;
@@ -533,12 +539,13 @@ int String::utf8_widechar_to_bytes(char* s, int length, unsigned int wc) {
 	}
 	return count;
 }
-int String::utf8_from_unicode(const wchar_t *unicode, int unicode_length, char* utf8,
-		int utf8_lenght) {
+int String::utf8_from_unicode(const wchar_t *unicode, int unicode_length,
+		char* utf8, int utf8_lenght) {
 	int i = 0, l = 0, count;
 	while (i <= unicode_length) {
 		if (utf8 != 0)
-			count = utf8_widechar_to_bytes(utf8 + l, utf8_lenght - l, unicode[i]);
+			count = utf8_widechar_to_bytes(utf8 + l, utf8_lenght - l,
+					unicode[i]);
 		else
 			count = utf8_widechar_to_bytes(0, 0, unicode[i]);
 		if (count <= 0)
@@ -582,5 +589,4 @@ int String::toUnicode(const wchar_t* wchar, int length) {
 wchar_t* String::toUnicode() {
 }
 } /* namespace pwt */
-
 

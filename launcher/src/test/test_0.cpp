@@ -10,6 +10,7 @@ using namespace pwt;
 
 class TestCanvas: public Canvas {
 public:
+	String s;
 	void paint(Graphics& gc) {
 		Rectangle bounds;
 		getBounds(bounds);
@@ -17,19 +18,18 @@ public:
 		gc.setForeground(Color::gray);
 		gc.setLineWidth(1);
 		//gc.setLineStyle(Graphics::LINE_DASHDOT);
-		gc.setLineCap(Graphics::CAP_FLAT);
-		gc.drawRect(0,0,bounds.width,bounds.height);
-		gc.drawArc(0,0,bounds.width,bounds.height,0,-90);
+		//gc.setLineCap(Graphics::CAP_FLAT);
+		gc.drawRect(0, 0, bounds.width, bounds.height);
+		gc.setForeground(Color::RED);
+		gc.fillRect(0, 0, bounds.width, bounds.height);
+		//gc.drawArc(0,0,bounds.width,bounds.height,0,-90);
 		gc.setForeground(Color(0));
-		gc.drawString("EL BASSBASI AZEDDINE",10,10);
+		gc.drawString(s, 10, 10);
 
 	}
-	void postEvent(Event* e) {
-		if (e->clazz == Event::PAINT_EVENT) {
-			PaintEvent* ee = (PaintEvent*) e;
-			paint(*ee->gc);
-		}
-
+	void setText(String s) {
+		this->s = s.clone();
+		this->repaint();
 	}
 
 };
@@ -50,19 +50,14 @@ public:
 		button.setLabel("hello...");
 		canvas.setBounds(120, 120, 250, 150);
 	}
-	void postEvent(Event* e) {
+	void processMouseEvent(MouseEvent& e) {
 		char txt[100];
-		if (e->clazz == Event::MOUSE_EVENT) {
-			MouseEvent* ee = (MouseEvent*) e;
-			sprintf(txt, "%d , %d", ee->x, ee->y);
-			setTitle(txt);
-
-		}
-		if (e->clazz == Event::WINDOW_EVENT) {
-			WindowEvent*ee = (WindowEvent*) e;
-			if (ee->type == WindowEvent::WINDOW_CLOSING) {
-				App::getApp()->exit();
-			}
+		sprintf(txt, "%d , %d", e.x, e.y);
+		canvas.setText(txt);
+	}
+	void processWindowEvent(WindowEvent& e){
+		if(e.type == WindowEvent::WINDOW_CLOSING){
+			App::getApp()->exit();
 		}
 	}
 };

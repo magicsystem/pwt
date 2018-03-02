@@ -116,7 +116,7 @@ static gboolean window_delete_cb(GtkWidget *widget, GdkEvent *event,
 	e.clazz = Event::WINDOW_EVENT;
 	e.type = WindowEvent::WINDOW_CLOSING;
 	e.source = c;
-	e.nativeEvent = (NativeEvent*) event;
+	e.nativeEvent = (PlatformEvent*) event;
 	e.opposite = 0;
 	ComponentPeer::sendEvent(c,&e);
 	/*  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
@@ -137,7 +137,7 @@ static void window_destroy_cb(GtkWidget *widget, GdkEvent *event,
 	e.clazz = Event::WINDOW_EVENT;
 	e.type = WindowEvent::WINDOW_CLOSED;
 	e.source = c;
-	e.nativeEvent = (NativeEvent*) event;
+	e.nativeEvent = (PlatformEvent*) event;
 	e.opposite = 0;
 	ComponentPeer::sendEvent(c,&e);
 	/*	(*cp_gtk_gdk_env())->CallVoidMethod(cp_gtk_gdk_env(), peer,
@@ -151,7 +151,7 @@ static void window_focus_state_change_cb(GtkWidget *widget, GParamSpec *pspec,
 	e.clazz = Event::WINDOW_EVENT;
 	//e.type = WindowEvent::WINDOW_CLOSED;
 	e.source = c;
-	e.nativeEvent = (NativeEvent*) pspec;
+	e.nativeEvent = (PlatformEvent*) pspec;
 	e.opposite = 0;
 
 	gboolean has_toplevel_focus = gtk_window_has_toplevel_focus(
@@ -177,7 +177,7 @@ static gboolean window_focus_in_cb(GtkWidget * widget, GdkEventFocus *event,
 	e.clazz = Event::WINDOW_EVENT;
 	e.type = WindowEvent::WINDOW_GAINED_FOCUS;
 	e.source = c;
-	e.nativeEvent = (NativeEvent*) event;
+	e.nativeEvent = (PlatformEvent*) event;
 	e.opposite = 0;
 	ComponentPeer::sendEvent(c,&e);
 	/*	(*cp_gtk_gdk_env())->CallVoidMethod(cp_gtk_gdk_env(), peer,
@@ -193,7 +193,7 @@ static gboolean window_focus_out_cb(GtkWidget * widget, GdkEventFocus *event,
 	e.clazz = Event::WINDOW_EVENT;
 	e.type = WindowEvent::WINDOW_LOST_FOCUS;
 	e.source = c;
-	e.nativeEvent = (NativeEvent*) event;
+	e.nativeEvent = (PlatformEvent*) event;
 	e.opposite = 0;
 	ComponentPeer::sendEvent(c,&e);
 	/*	(*cp_gtk_gdk_env())->CallVoidMethod(cp_gtk_gdk_env(), peer,
@@ -209,7 +209,7 @@ static gboolean window_window_state_cb(GtkWidget *widget, GdkEvent *event,
 	e.clazz = Event::WINDOW_EVENT;
 	e.type = WindowEvent::WINDOW_STATE_CHANGED;
 	e.source = c;
-	e.nativeEvent = (NativeEvent*) event;
+	e.nativeEvent = (PlatformEvent*) event;
 	e.opposite = 0;
 	int new_java_state = 0;
 	/* Put together the new state and let the java side figure out what

@@ -36,7 +36,11 @@ FramePeer* pwt::Frame::getFramePeer() {
 }
 
 void Frame::create() {
-	FramePeer* peer = Toolkit::getDefaultToolkit()->getFramePeer();
+	create(Toolkit::getDefaultToolkit());
+}
+
+void pwt::Frame::create(Toolkit* toolkit) {
+	FramePeer* peer = toolkit->getFramePeer();
 	this->peer = peer;
 	peer->create(this, (Container*) 0);
 }

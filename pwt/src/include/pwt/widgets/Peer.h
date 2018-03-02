@@ -25,6 +25,9 @@ public:
 	static inline void sendPlatformEvent(Component* c, PlatformEvent* e) {
 		c->postPlatformEvent(e);
 	}
+	static inline void paint(Component* c,Graphics* gc){
+		c->paint(*gc);
+	}
 	virtual void create(Component* c, Container* parent)=0;
 	virtual void dispose(Component* c)=0;
 	virtual Toolkit* getToolkit()=0;
@@ -32,7 +35,13 @@ public:
 	virtual void setBounds(Component* c, Rectangle& r)=0;
 	virtual void getBounds(Component* c, Rectangle& r)=0;
 	virtual void postEvent(Component* c, Event* e)=0;
-	virtual void postNativeEvent(Component* c, PlatformEvent* e)=0;
+	virtual void postPlatformEvent(Component* c, PlatformEvent* e)=0;
+	virtual void paint(Component* c,Graphics& g)=0;
+	virtual void update(Component* c,Graphics& g)=0;
+	virtual void print(Component* c,Graphics& g)=0;
+	virtual void repaint(Component* c)=0;
+	virtual void repaint(Component* c,Rectangle& r)=0;
+	virtual void getGraphics(Component* c,Graphics& g)=0;
 };
 class ButtonPeer: public virtual ComponentPeer {
 public:

@@ -79,6 +79,7 @@ public:
 	Frame();
 	~Frame();
 	void create();
+	void create(Toolkit* toolkit);
 	const char* getTitle();
 	void setTitle(const char* title);
 	bool isResizable();

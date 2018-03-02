@@ -18,6 +18,10 @@ protected:
 public:
 	Window();
 	~Window();
+protected:
+	void processEvent(Event& e);
+	virtual void processWindowEvent(WindowEvent& e);
+
 };
 }  // namespace pwt
 #endif /* INCLUDE_PWT_WIDGETS_WINDOW_H_ */

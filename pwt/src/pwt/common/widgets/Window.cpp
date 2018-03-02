@@ -31,4 +31,19 @@ Window::~Window() {
 		this->peer = 0;
 	}
 }
+void pwt::Window::processEvent(Event& e) {
+	if (e.clazz == Event::WINDOW_EVENT) {
+		processWindowEvent(reinterpret_cast<WindowEvent&>(e));
+	}
+	Container::processEvent(e);
+}
+
+void pwt::Window::processWindowEvent(WindowEvent& e) {
+	ComponentPeer* peer = getComponentPeer();
+	if (peer != 0) {
+		peer->postEvent(this, &e);
+	}
+}
+
 }  // namespace pwt
+

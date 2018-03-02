@@ -14,6 +14,12 @@
 #ifdef __linux
 class GtkToolkit: public pwt::Toolkit {
 public:
+	int click_count;
+	guint32 button_click_time;
+	GdkWindow *button_window;
+	guint button_number_direction;
+	int hasBeenDragged;
+public:
 	GtkComponentPeer componentPeer;
 	GtkContainerPeer containerPeer;
 	GtkWindowPeer windowPeer;
