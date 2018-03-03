@@ -34,29 +34,67 @@ public:
 
 };
 
+class SwingButton: public Canvas {
+public:
+	String text;
+	void paint(Graphics& g) {
+		Rectangle bounds;
+		getBounds(bounds);
+		g.setForeground(0xFF7A8A99);
+		g.drawRect(0, 0, bounds.width - 2, bounds.height - 2);
+		g.setForeground(Color(255, 255, 255));
+		g.drawRect(1, 1, bounds.width - 2, bounds.height - 2);
+		g.setForeground(0xFFEEEEEE);
+		g.drawLine(0, bounds.height - 1, 1, bounds.height - 2);
+		g.drawLine(bounds.width - 1, 0, bounds.width - 2, 1);
+		g.setForeground(0xFFB8CFE5);
+		g.drawLine(1, 1, 1, bounds.height - 2);
+		g.drawLine(1, 1, bounds.width - 2, 1);
+		g.setForeground(0xFF7A8A99);
+		g.drawRect(0, 0, bounds.width - 3, bounds.height - 3);
+		g.drawLine(bounds.width - 2, 0, bounds.width - 2, 0);
+		g.drawLine(0, bounds.height - 2, 0, bounds.height - 2);
+		g.setForeground(0xEEEEEE);
+		g.drawLine(bounds.width - 1, 0, bounds.width - 1, 0);
+		g.drawLine(0, bounds.height - 1, 0, bounds.height - 1);
+		g.setForeground(0xFFB8CFE5);
+		g.fillRect(1,1,bounds.width-4,bounds.height-4);
+		//g.translate(-x, -y);
+
+	}
+	void setLabel(String s) {
+		this->text = s.clone();
+		this->repaint();
+	}
+
+};
+
 class TestFrame: public Frame {
 public:
 	TestCanvas canvas;
 	Button button;
+	SwingButton swing;
 	TestFrame() {
 		create();
 		//canvas.create(this);
 		//button.create(this);
 		add(&canvas);
 		add(&button);
+		add(&swing);
 	}
 	void init() {
 		button.setBounds(10, 10, 100, 100);
 		button.setLabel("hello...");
-		canvas.setBounds(120, 120, 250, 150);
+		//canvas.setBounds(120, 120, 250, 150);
+		swing.setBounds(120, 120, 250, 150);
 	}
 	void processMouseEvent(MouseEvent& e) {
 		char txt[100];
 		sprintf(txt, "%d , %d", e.x, e.y);
-		canvas.setText(txt);
+		swing.setLabel(txt);
 	}
-	void processWindowEvent(WindowEvent& e){
-		if(e.type == WindowEvent::WINDOW_CLOSING){
+	void processWindowEvent(WindowEvent& e) {
+		if (e.type == WindowEvent::WINDOW_CLOSING) {
 			App::getApp()->exit();
 		}
 	}
