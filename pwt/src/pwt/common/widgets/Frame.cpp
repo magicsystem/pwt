@@ -12,27 +12,6 @@ Frame::Frame() {
 }
 
 Frame::~Frame() {
-	FramePeer* peer = getFramePeer();
-	if (peer != 0) {
-		peer->dispose(this);
-		this->peer = 0;
-	}
-}
-
-WindowPeer* pwt::Frame::getWindowPeer() {
-	return getFramePeer();
-}
-
-ContainerPeer* pwt::Frame::getContainerPeer() {
-	return getFramePeer();
-}
-
-ComponentPeer* pwt::Frame::getComponentPeer() {
-	return getFramePeer();
-}
-
-FramePeer* pwt::Frame::getFramePeer() {
-	return (FramePeer*) this->peer;
 }
 
 void Frame::create() {
@@ -46,7 +25,7 @@ void pwt::Frame::create(Toolkit* toolkit) {
 }
 
 const char* Frame::getTitle() {
-	FramePeer* peer = getFramePeer();
+	FramePeer* peer = dynamic_cast<FramePeer*>(this->peer);
 	if (peer != 0) {
 		return peer->getTitle(this);
 	} else
@@ -54,14 +33,14 @@ const char* Frame::getTitle() {
 }
 
 void Frame::setTitle(const char* title) {
-	FramePeer* peer = getFramePeer();
+	FramePeer* peer = dynamic_cast<FramePeer*>(this->peer);
 	if (peer != 0) {
 		return peer->setTitle(this, title);
 	}
 }
 
 bool Frame::isResizable() {
-	FramePeer* peer = getFramePeer();
+	FramePeer* peer = dynamic_cast<FramePeer*>(this->peer);
 	if (peer != 0) {
 		return peer->isResizable(this);
 	} else
@@ -69,21 +48,21 @@ bool Frame::isResizable() {
 }
 
 void Frame::setResizable(bool resizable) {
-	FramePeer* peer = getFramePeer();
+	FramePeer* peer = dynamic_cast<FramePeer*>(this->peer);
 	if (peer != 0) {
 		peer->setResizable(this, resizable);
 	}
 }
 
 void Frame::setState(int state) {
-	FramePeer* peer = getFramePeer();
+	FramePeer* peer = dynamic_cast<FramePeer*>(this->peer);
 	if (peer != 0) {
 		return peer->setState(this, state);
 	}
 }
 
 int Frame::getState() {
-	FramePeer* peer = getFramePeer();
+	FramePeer* peer = dynamic_cast<FramePeer*>(this->peer);
 	if (peer != 0) {
 		return peer->getState(this);
 	} else

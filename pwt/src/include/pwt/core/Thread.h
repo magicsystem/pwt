@@ -30,6 +30,14 @@ public:
 	~MutexLocker();
 };
 
+class PUBLIC Semaphore: public PlatformObject {
+private:
+	void* handles[2];
+public:
+
+
+};
+
 class PUBLIC Thread: public PlatformObject {
 public:
 	Thread();

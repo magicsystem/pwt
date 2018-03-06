@@ -11,10 +11,6 @@
 namespace pwt {
 class WindowPeer;
 class PUBLIC Window: public Container {
-protected:
-	virtual WindowPeer* getWindowPeer();
-	ContainerPeer* getContainerPeer();
-	ComponentPeer* getComponentPeer();
 public:
 	Window();
 	~Window();

@@ -11,7 +11,6 @@
 #include "GtkContainerPeer.h"
 #include "GtkToolkit.h"
 using namespace pwt;
-/* FIXME: use gtk-double-click-time, gtk-double-click-distance */
 #define MULTI_CLICK_TIME   250
 static int button_to_awt_mods(int button) {
 	switch (button) {
@@ -160,18 +159,16 @@ static gboolean component_focus_out_cb(GtkWidget *widget, GdkEventFocus *event,
 }
 
 GtkComponentPeer::GtkComponentPeer() {
-	// TODO Auto-generated constructor stub
 
 }
 
 GtkComponentPeer::~GtkComponentPeer() {
-	// TODO Auto-generated destructor stub
 }
 
 void GtkComponentPeer::create(Component* c, Container* parent) {
 }
 
-void GtkComponentPeer::dispose(Component* c) {
+void GtkComponentPeer::dispose(Widget* c) {
 }
 
 Toolkit* GtkComponentPeer::getToolkit() {
@@ -187,8 +184,22 @@ void GtkComponentPeer::setVisible(Component* c, bool b) {
 	else
 		gtk_widget_hide(t->widget);
 }
+void GtkComponentPeer::setEnabled(pwt::Component* c, bool b) {
+	GtkComponent_t* t = (GtkComponent_t*) getReserved(c);
+	if (t->widget == 0)
+		return;
 
-void GtkComponentPeer::setBounds(Component* c, Rectangle& r) {
+	gdk_threads_enter();
+
+	gtk_widget_set_sensitive(t->widget, b);
+
+	gdk_threads_leave();
+}
+void GtkComponentPeer::setDeleteOnDispose(pwt::Widget* c, bool delete_) {
+	GtkComponent_t* t = (GtkComponent_t*) getReserved(c);
+	t->deleteOnDispose = delete_;
+}
+void GtkComponentPeer::setBounds(Component* c, const Rectangle& r) {
 	GtkComponent_t* t = (GtkComponent_t*) getReserved(c);
 	if (t->widget == 0)
 		return;
@@ -243,10 +254,10 @@ void GtkComponentPeer::repaint(pwt::Component* c, pwt::Rectangle& r) {
 	gtk_widget_queue_draw_area(t->widget, r.x, r.y, r.width, r.height);
 }
 
-void GtkComponentPeer::postEvent(Component* c, Event* e) {
+void GtkComponentPeer::postEvent(pwt::Widget* c, Event* e) {
 	switch (e->clazz) {
 	case Event::PAINT_EVENT:
-		ComponentPeer::paint(c, ((PaintEvent*) e)->gc);
+		ComponentPeer::paint((pwt::Component*)c, ((PaintEvent*) e)->gc);
 		break;
 	default:
 		break;
@@ -294,7 +305,7 @@ void GtkComponentPeer::connect_mouse_signals(Component* c) {
 
 void GtkComponentPeer::addWidget(Container* parent, GtkWidget* widget) {
 	//GtkComponent_t *t_p;
-	GtkContainerPeer* peer = dynamic_cast<GtkContainerPeer*>(getPeer(parent));
+	GtkContainerPeer* peer =(GtkContainerPeer*) WidgetPeer::getWidgetPeer(parent)->getSystemPeer();
 	peer->add(parent, widget);
 }
 
@@ -311,7 +322,7 @@ void GtkComponentPeer::connectSignals(Component* c) {
 	connect_mouse_signals(c);
 }
 
-void GtkComponentPeer::postPlatformEvent(pwt::Component* c,
+void GtkComponentPeer::postPlatformEvent(pwt::Widget* c,
 		pwt::PlatformEvent* e) {
 	switch (e->msg) {
 	case pwt::PlatformEvent::expose_event:
@@ -591,6 +602,11 @@ void GtkComponentPeer::motion_notify_event(pwt::PlatformEvent* e) {
 	e->result = FALSE;
 
 }
+
+void* GtkComponentPeer::getSystemPeer() {
+	return (GtkComponentPeer*)this;
+}
+
 void GtkComponentPeer::scroll_event(pwt::PlatformEvent* e) {
 	int rotation;
 	MouseWheelEvent ee;

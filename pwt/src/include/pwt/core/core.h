@@ -10,6 +10,7 @@
 #include <math.h>
 #include "String.h"
 #include "Object.h"
+#include "Enumeration.h"
 #include "Thread.h"
 #include "App.h"
 #include "ArrayObject.h"

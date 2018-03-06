@@ -77,4 +77,17 @@ pwt::Ptr<pwt::Font> GtkToolkit::getSystemFont() {
 	}
 	return &systemFont;
 }
+
+pwt::MenuBarPeer* GtkToolkit::getMenuBarPeer() {
+	return &menuBarPeer;
+}
+
+pwt::MenuItemPeer* GtkToolkit::getMenuItemPeer() {
+	return &menuItemPeer;
+}
+
+pwt::MenuPeer* GtkToolkit::getMenuPeer() {
+	return &menuPeer;
+}
+
 #endif

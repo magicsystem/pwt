@@ -21,7 +21,7 @@ public:
 	~GtkFramePeer();
 	void create(pwt::Component* c, pwt::Container* parent);
 	const char* getTitle(pwt::Component* f);
-	void setTitle(pwt::Component* f, pwt::String title);
+	void setTitle(pwt::Component* f, const pwt::String& title);
 	bool isResizable(pwt::Component* f);
 	void setResizable(pwt::Component* f, bool resizable);
 	void setState(pwt::Component* f, int state);

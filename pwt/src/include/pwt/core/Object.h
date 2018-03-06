@@ -55,6 +55,9 @@ public:
 		if (obj)
 			obj->decRef();
 	}
+	void startRef(){
+		obj->startRef();
+	}
 	T *operator->() const {
 		return obj;
 	}
@@ -72,7 +75,7 @@ public:
 		obj = ptr;
 	}
 	void operator=(const Ptr& ptr) {
-		if (ptr)
+		if (ptr.obj)
 			ptr.obj->incRef();
 		if (obj)
 			obj->decRef();

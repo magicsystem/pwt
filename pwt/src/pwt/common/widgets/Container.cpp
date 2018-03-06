@@ -9,19 +9,12 @@
 namespace pwt {
 
 Container::Container() {
-	// TODO Auto-generated constructor stub
+	this->children = 0;
 
-}
-ComponentPeer* Container::getComponentPeer() {
-	return getContainerPeer();
-}
-
-ContainerPeer* Container::getContainerPeer() {
-	return (ContainerPeer*) this->peer;
 }
 
 Container::~Container() {
-	ContainerPeer* peer = getContainerPeer();
+	ContainerPeer* peer = dynamic_cast<ContainerPeer*>(this->peer);
 	if (peer != 0) {
 		peer->dispose(this);
 		this->peer = 0;

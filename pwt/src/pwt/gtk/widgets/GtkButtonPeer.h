@@ -15,7 +15,7 @@ public:
 	~GtkButtonPeer();
 	void create(pwt::Component* c, pwt::Container* parent);
 	pwt::String getLabel(pwt::Component* c);
-	void setLabel(pwt::Component* c, pwt::String label);
+	void setLabel(pwt::Component* c, const pwt::String& label);
 	void setBounds(pwt::Component* c,pwt::Rectangle& r);
 };
 #endif

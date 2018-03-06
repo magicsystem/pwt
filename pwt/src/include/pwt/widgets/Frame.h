@@ -12,11 +12,6 @@
 namespace pwt {
 class FramePeer;
 class PUBLIC Frame: public Window {
-protected:
-	WindowPeer* getWindowPeer();
-	ContainerPeer* getContainerPeer();
-	ComponentPeer* getComponentPeer();
-	virtual FramePeer* getFramePeer();
 public:
 	enum {
 		/**

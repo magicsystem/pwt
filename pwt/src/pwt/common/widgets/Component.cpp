@@ -7,25 +7,29 @@
 
 #include <pwt.h>
 namespace pwt {
-ComponentPeer* Component::getComponentPeer() {
-	return (ComponentPeer*) this->peer;
-}
+
 Component::Component() {
-	this->peer = 0;
-	memset(this->handles, 0, sizeof(handles));
+	this->next = 0;
+	this->parent = 0;
 }
 
 Component::~Component() {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->dispose(this);
 		this->peer = 0;
 	}
 }
 void Component::setVisible(bool b) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->setVisible(this, b);
+	}
+}
+void Component::setEnabled(bool b) {
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
+	if (peer != 0) {
+		peer->setEnabled(this, b);
 	}
 }
 
@@ -35,8 +39,8 @@ void Component::create(Container* parent) {
 	this->peer = peer;
 }
 
-void Component::setBounds(Rectangle& r) {
-	ComponentPeer* peer = getComponentPeer();
+void Component::setBounds(const Rectangle& r) {
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->setBounds(this, r);
 	}
@@ -48,7 +52,7 @@ void Component::setBounds(int x, int y, int width, int height) {
 }
 
 void Component::getBounds(Rectangle& r) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->getBounds(this, r);
 	} else {
@@ -57,35 +61,35 @@ void Component::getBounds(Rectangle& r) {
 }
 
 void Component::paint(Graphics& g) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->paint(this, g);
 	}
 }
 
 void Component::update(Graphics& g) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->update(this, g);
 	}
 }
 
 void Component::print(Graphics& g) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->print(this, g);
 	}
 }
 
 void Component::repaint() {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->repaint(this);
 	}
 }
 
 void Component::repaint(Rectangle& r) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->repaint(this, r);
 	}
@@ -97,22 +101,13 @@ void Component::repaint(int x, int y, int width, int height) {
 }
 
 void Component::getGraphics(Graphics& g) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->getGraphics(this, g);
 	}
 }
-
-Toolkit* Component::getToolkit() {
-	ComponentPeer* peer = getComponentPeer();
-	if (peer != 0) {
-		return peer->getToolkit();
-	} else {
-		return Toolkit::getDefaultToolkit();
-	}
-}
 void Component::postPlatformEvent(PlatformEvent* e) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->postPlatformEvent(this, e);
 	}
@@ -141,7 +136,7 @@ void Component::processEvent(Event& e) {
 		processPaintEvent(reinterpret_cast<PaintEvent&>(e));
 		break;
 	default:
-		ComponentPeer* peer = getComponentPeer();
+		ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 		if (peer != 0) {
 			peer->postEvent(this, &e);
 		}
@@ -150,49 +145,49 @@ void Component::processEvent(Event& e) {
 }
 
 void Component::processComponentEvent(ComponentEvent& e) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->postEvent(this, &e);
 	}
 }
 
 void Component::processFocusEvent(FocusEvent& e) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->postEvent(this, &e);
 	}
 }
 
 void Component::processKeyEvent(KeyEvent& e) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->postEvent(this, &e);
 	}
 }
 
 void Component::processMouseEvent(MouseEvent& e) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->postEvent(this, &e);
 	}
 }
 
 void Component::processMouseMotionEvent(MouseEvent& e) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->postEvent(this, &e);
 	}
 }
 
 void Component::processMouseWheelEvent(MouseWheelEvent& e) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->postEvent(this, &e);
 	}
 }
 
 void Component::processPaintEvent(PaintEvent& e) {
-	ComponentPeer* peer = getComponentPeer();
+	ComponentPeer* peer = dynamic_cast<ComponentPeer*>(this->peer);
 	if (peer != 0) {
 		peer->postEvent(this, &e);
 	}

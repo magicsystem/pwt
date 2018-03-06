@@ -725,7 +725,8 @@ static gboolean window_configure_cb(GtkWidget *widget, GdkEventConfigure *event,
 
 	return FALSE;
 }
-
+GtkContainer* GtkWindowPeer::getParenting(pwt::Component* c) {
+}
 void GtkWindowPeer::add(Component* c, GtkWidget* widget) {
 	GtkComponent_t* t = (GtkComponent_t*) getReserved(c);
 	if (t->widget == 0)
@@ -789,4 +790,7 @@ void GtkWindowPeer::connectSignals(Component* c) {
 	/* FIXME: override focus signals here to prevent child fixed repaint? */
 
 }
+
+
+
 #endif

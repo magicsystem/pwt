@@ -13,14 +13,14 @@ class Toolkit;
 class PUBLIC App {
 private:
 	static App* defaultApp;
-	void* reserved[5];
+	void* reserved[2];
 public:
 	App();
 	virtual ~App();
 	static App* getApp();
-	static Toolkit* getSystemToolkit();
-	static Toolkit* getDefaultToolkit();
-	static Toolkit* setDefaultToolkit(Toolkit* toolkit);
+	Toolkit* getSystemToolkit();
+	Toolkit* getDefaultToolkit();
+	Toolkit* setDefaultToolkit(Toolkit* toolkit);
 	virtual int run();
 	virtual int exit();
 };

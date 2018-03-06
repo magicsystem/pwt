@@ -11,9 +11,6 @@
 namespace pwt {
 class CanvasPeer;
 class PUBLIC Canvas: public Component {
-protected:
-	ComponentPeer* getComponentPeer();
-	virtual CanvasPeer* getCanvasPeer();
 public:
 	Canvas();
 	~Canvas();

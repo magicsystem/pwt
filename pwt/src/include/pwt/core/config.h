@@ -27,6 +27,21 @@
 #define PUBLIC
 #endif
 
+typedef unsigned char      byte;
+typedef signed char        int8;
+typedef unsigned char      uint8;
+
+typedef short unsigned     word;
+typedef short int          int16;
+typedef short unsigned     uint16;
+
+typedef unsigned int       dword;
+typedef int                int32;
+typedef unsigned int       uint32;
+typedef wchar_t            wchar;
+typedef long long int      int64;
+typedef long long unsigned uint64;
+typedef bool boolean;
 
 
 #endif /* INCLUDE_PWT_CORE_CONFIG_H_ */

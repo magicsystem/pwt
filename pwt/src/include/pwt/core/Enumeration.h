@@ -14,7 +14,6 @@ class PUBLIC IEnumeration: public IDestruct {
 public:
 	static IEnumeration* getEmptyEnumeration();
 	virtual void close()=0;
-	virtual IEnumeration* copy(void* ptr, size_t size)=0;
 	virtual void reset()=0;
 	virtual bool next(void* obj) = 0;
 };
@@ -27,15 +26,16 @@ class Enumeration {
 public:
 	IEnumeration *p;
 	void* reserved[10];
+private:
+	Enumeration(const Enumeration<T> &it) {
+		p = it.p;
+	}
+	void operator=(const Enumeration<T> &it) {
+		p = it.p;
+	}
 public:
 	Enumeration() {
 		this->p = IEnumeration::getEmptyEnumeration();
-	}
-	Enumeration(IEnumeration *it) {
-		this->p = it;
-	}
-	Enumeration(const Enumeration<T> &it) {
-		this->p = it->p->copy(reserved, sizeof(reserved));
 	}
 	~Enumeration() {
 		p->close();
@@ -43,10 +43,6 @@ public:
 	void operator =(IEnumeration *it) {
 		this->p->close();
 		this->p = it;
-	}
-	void operator =(const Enumeration<T> &it) {
-		this->p->close();
-		this->p = it->p->copy(reserved, sizeof(reserved));
 	}
 	bool next(T &t) {
 		return this->p->next((void*) &t);

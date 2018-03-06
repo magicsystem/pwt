@@ -9,19 +9,21 @@
 #define PWT_GTK_WIDGETS_GTKWINDOWPEER_H_
 #include "GtkContainerPeer.h"
 #ifdef __linux
-struct GtkWindow_t : public GtkContainer_t {
+struct GtkWindow_t: public GtkContainer_t {
 
 };
-class GtkWindowPeer: public GtkContainerPeer,public virtual pwt::WindowPeer {
+class GtkWindowPeer: public GtkContainerPeer, public virtual pwt::WindowPeer {
 public:
 	GtkWindowPeer();
 	~GtkWindowPeer();
 public:
-	void add(pwt::Component* c,GtkWidget* widget);
-	int createWindow (pwt::Component* obj,GdkWindowTypeHint type, pwt::Container* parent);
+	GtkContainer* getParenting(pwt::Component* c);
+	void add(pwt::Component* c, GtkWidget* widget);
+	int createWindow(pwt::Component* obj, GdkWindowTypeHint type,
+			pwt::Container* parent);
 	void create(pwt::Component* c, pwt::Container* parent);
-	void setBounds(pwt::Component* c,pwt::Rectangle& r);
-	void setVisible(pwt::Component* c,bool b);
+	void setBounds(pwt::Component* c, pwt::Rectangle& r);
+	void setVisible(pwt::Component* c, bool b);
 	void connectSignals(pwt::Component* c);
 };
 #endif

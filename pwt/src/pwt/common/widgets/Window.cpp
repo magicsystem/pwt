@@ -12,24 +12,7 @@ Window::Window() {
 
 }
 
-WindowPeer* Window::getWindowPeer() {
-	return (WindowPeer*) this->peer;
-}
-
-ContainerPeer* Window::getContainerPeer() {
-	return getWindowPeer();
-}
-
-ComponentPeer* Window::getComponentPeer() {
-	return getWindowPeer();
-}
-
 Window::~Window() {
-	WindowPeer* peer = getWindowPeer();
-	if (peer != 0) {
-		peer->dispose(this);
-		this->peer = 0;
-	}
 }
 void pwt::Window::processEvent(Event& e) {
 	if (e.clazz == Event::WINDOW_EVENT) {
@@ -39,9 +22,8 @@ void pwt::Window::processEvent(Event& e) {
 }
 
 void pwt::Window::processWindowEvent(WindowEvent& e) {
-	ComponentPeer* peer = getComponentPeer();
-	if (peer != 0) {
-		peer->postEvent(this, &e);
+	if (this->peer != 0) {
+		this->peer->postEvent(this, &e);
 	}
 }
 

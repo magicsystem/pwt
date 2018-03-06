@@ -65,3 +65,22 @@ void operator delete(void* ptr, pwt::IMem* mem) {
 		pwt::IMem::getGlobal()->free(ptr);
 	return mem->free(ptr);
 }
+
+void* pwt::IMem::alloc(IMem* mem, size_t size) {
+}
+
+void* operator new[](size_t size) {
+	return pwt::IMem::getGlobal()->alloc(size);
+}
+
+void* operator new[](size_t size, pwt::IMem* mem) {
+	if (mem == 0)
+		return pwt::IMem::getGlobal()->alloc(size);
+	return mem->alloc(size);
+}
+
+void operator delete[](void* ptr) {
+}
+
+void operator delete[](void* ptr, pwt::IMem* mem) {
+}

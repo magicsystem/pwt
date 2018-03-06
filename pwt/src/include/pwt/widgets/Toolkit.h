@@ -19,6 +19,9 @@ public:
 	virtual ButtonPeer* getButtonPeer()=0;
 	virtual CanvasPeer* getCanvasPeer()=0;
 	virtual FramePeer* getFramePeer()=0;
+	virtual MenuItemPeer* getMenuItemPeer()=0;
+	virtual MenuPeer* getMenuPeer()=0;
+	virtual MenuBarPeer* getMenuBarPeer()=0;
 	virtual Ptr<Font> getSystemFont()=0;
 };
 }  // namespace pwt

@@ -397,7 +397,6 @@ void Graphics::drawRect(int x, int y, int width, int height) {
 	} else {
 		gdk_draw_rectangle(t->drawable, t->gc, FALSE, x, y, width, height);
 	}
-
 }
 
 void Graphics::fillRect(int x, int y, int width, int height) {
@@ -412,27 +411,7 @@ void Graphics::fillRect(int x, int y, int width, int height) {
 		gdk_draw_rectangle(t->drawable, t->gc, TRUE, x, y, width, height);
 	}
 }
-void Graphics::drawString(String str, int x, int y) {
-	if (str.getLength() == 0)
-		return;
-	Graphics_t* t = (Graphics_t*) this->handles;
-	graphics_check(t, DRAW);
-	if (t->state & GRAPHICS_IS_CAIRO) {
-		if (t->layout == 0)
-			graphics_create_layout(t);
-		pango_layout_set_attributes(t->layout, 0);
-		pango_layout_set_text(t->layout, str.getChars(), str.getLength());
-		pango_layout_set_single_paragraph_mode(t->layout, TRUE);
-		pango_layout_set_tabs(t->layout, 0);
-		cairo_move_to(t->cairo, x, y);
-		pango_cairo_show_layout(t->cairo, t->layout);
-		cairo_new_path(t->cairo);
 
-	} else {
-		//gdk_draw_string(t->drawable, font, t->gc, x, y, str.getChars());
-
-	}
-}
 
 bool Graphics::isDisposed() {
 }
@@ -695,6 +674,27 @@ void graphics_draw_text(Graphics_t* t, int x, int y, int flags) {
 		}
 	}
 }
+void Graphics::drawString(String str, int x, int y) {
+	if (str.getLength() == 0)
+		return;
+	Graphics_t* t = (Graphics_t*) this->handles;
+	graphics_check(t, DRAW);
+	if (t->state & GRAPHICS_IS_CAIRO) {
+		if (t->layout == 0)
+			graphics_create_layout(t);
+		pango_layout_set_attributes(t->layout, 0);
+		pango_layout_set_text(t->layout, str.getChars(), str.getLength());
+		pango_layout_set_single_paragraph_mode(t->layout, TRUE);
+		pango_layout_set_tabs(t->layout, 0);
+		cairo_move_to(t->cairo, x, y);
+		pango_cairo_show_layout(t->cairo, t->layout);
+		cairo_new_path(t->cairo);
+
+	} else {
+		//gdk_draw_string(t->drawable, font, t->gc, x, y, str.getChars());
+
+	}
+}
 void Graphics::drawString(const char* string, int length, int x, int y) {
 	drawString(string, length, x, y, false);
 }
@@ -761,6 +761,7 @@ void Graphics::drawText(String string, int x, int y, int flags) {
 void Graphics::drawText(const char* string, int length, int x, int y,
 		int flags) {
 	Graphics_t* t = (Graphics_t*) this->handles;
+	graphics_check(t, DRAW);
 	if (t->cairo == 0)
 		return;
 	if (string == 0)

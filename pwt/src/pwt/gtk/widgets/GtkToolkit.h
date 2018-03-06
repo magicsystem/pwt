@@ -11,6 +11,8 @@
 #include "GtkFramePeer.h"
 #include "GtkButtonPeer.h"
 #include "GtkCanvasPeer.h"
+#include "GtkMenuPeer.h"
+#include "GtkMenuBarPeer.h"
 #ifdef __linux
 class GtkToolkit: public pwt::Toolkit {
 public:
@@ -26,6 +28,9 @@ public:
 	GtkFramePeer framePeer;
 	GtkButtonPeer buttonPeer;
 	GtkCanvasPeer canvasPeer;
+	GtkMenuBarPeer menuBarPeer;
+	GtkMenuItemPeer menuItemPeer;
+	GtkMenuPeer menuPeer;
 	GtkWindowGroup* group;
 	pwt::Font systemFont;
 public:
@@ -36,7 +41,10 @@ public:
 	pwt::FramePeer* getFramePeer();
 	pwt::ButtonPeer* getButtonPeer();
 	pwt::CanvasPeer* getCanvasPeer();
-	GtkWindowGroup* getWindowGroup();
+	pwt::MenuBarPeer* getMenuBarPeer();
+	pwt::MenuItemPeer* getMenuItemPeer();
+	pwt::MenuPeer* getMenuPeer();
+ 	GtkWindowGroup* getWindowGroup();
 	pwt::Ptr<pwt::Font> getSystemFont();
 };
 #endif

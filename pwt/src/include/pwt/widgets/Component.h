@@ -8,25 +8,29 @@
 #ifndef INCLUDE_PWT_WIDGETS_COMPONENT_H_
 #define INCLUDE_PWT_WIDGETS_COMPONENT_H_
 
-#include "Event.h"
+#include "Widget.h"
 namespace pwt {
 class ComponentPeer;
 class Container;
 class Toolkit;
-class PUBLIC Component: public PlatformObject {
-protected:
-	void* peer;
+class PUBLIC Component: public Widget {
 private:
 	friend class ComponentPeer;
-	void* handles[5];
+	Container* parent;
+	Component* next;
+	EventTable eventTable;
+	Rectangle rect;
+	Color foreground;
+	Color background;
+	Ptr<Font> font;
 protected:
 	Component();
-	virtual ComponentPeer* getComponentPeer();
 public:
-	virtual ~Component();
+	~Component();
 	virtual void create(Container* parent);
 	void setVisible(bool b);
-	void setBounds(Rectangle& r);
+	void setEnabled(bool b);
+	void setBounds(const Rectangle& r);
 	void getBounds(Rectangle& r);
 	inline Rectangle getBounds() {
 		Rectangle r;
@@ -34,7 +38,6 @@ public:
 		return r;
 	}
 	void setBounds(int x, int y, int width, int height);
-	Toolkit* getToolkit();
 protected:
 	virtual void postPlatformEvent(PlatformEvent* e);
 	virtual void postEvent(Event* e);
@@ -51,11 +54,11 @@ protected:
 	virtual void update(Graphics& g);
 	virtual void print(Graphics& g);
 public:
+
 	void repaint();
 	void repaint(Rectangle& r);
 	void repaint(int x, int y, int width, int height);
 	void getGraphics(Graphics& g);
-
 
 };
 }  // namespace pwt

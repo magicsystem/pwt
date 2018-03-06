@@ -4,9 +4,11 @@
  *  Created on: 9 févr. 2018
  *      Author: azeddine
  */
-#include <pwt.h>
+#include "arrayctrl/ArrayCtrl.h"
 #include <stdio.h>
+
 using namespace pwt;
+
 
 class TestCanvas: public Canvas {
 public:
@@ -31,6 +33,7 @@ public:
 		this->s = s.clone();
 		this->repaint();
 	}
+
 
 };
 
@@ -69,29 +72,82 @@ public:
 
 };
 
+
+class Table : public Canvas {
+public:
+	struct Elmt {
+		Rectangle r;
+		String text;
+	};
+
+private:
+
+};
+
+class MyArrayCtrl :
+		public ARRAY_CTRL::ArrayCtrl,
+		public ARRAY_CTRL::IView,
+		public ARRAY_CTRL::IModel
+{
+public:
+	virtual void Draw(Graphics& g, Rectangle& rc, int r, int c, ARRAY_CTRL::IModel* d) override {
+		//g.setBackground(0xFFB8CFE5);
+		//g.drawRectangle(&rc);
+		//g.setClipping(rc);
+		//g.setForeground(Color(255,0,0));
+		g.drawString("Azeddine",5,rc.x,rc.y,true);
+	}
+
+	virtual void* getValue(int r, int c) override {
+		return &data[r][c];
+	}
+	virtual void setValue(int r, int c, void* v) override {
+		data[r][c] = *((String*) v);
+	}
+	virtual int getRowCount() override {
+		return 100;
+	}
+	virtual int getColCount() override {
+		return 6;
+	}
+
+	MyArrayCtrl() {
+		setModel(this);
+		for (int i = 0; i < 6 ; ++i) {
+			addColumn("Column",40).setView(this);
+			for (int r = 0; r < 100; ++r) {
+				data[r][i] = "Hello world!";
+			}
+		}
+	}
+
+	String data[100][6];
+private:
+};
+
 class TestFrame: public Frame {
 public:
-	TestCanvas canvas;
-	Button button;
-	SwingButton swing;
+	MyArrayCtrl canvas;
+	//Button button;
+	//SwingButton swing;
 	TestFrame() {
 		create();
 		//canvas.create(this);
 		//button.create(this);
 		add(&canvas);
-		add(&button);
-		add(&swing);
+		//add(&button);
+		//add(&swing);
 	}
 	void init() {
-		button.setBounds(10, 10, 100, 100);
-		button.setLabel("hello...");
-		//canvas.setBounds(120, 120, 250, 150);
-		swing.setBounds(120, 120, 250, 150);
+		//button.setBounds(10, 10, 100, 100);
+		//button.setLabel("hello...");
+		canvas.setBounds(120, 120, 250, 150);
+		//swing.setBounds(120, 120, 250, 150);
 	}
 	void processMouseEvent(MouseEvent& e) {
 		char txt[100];
 		sprintf(txt, "%d , %d", e.x, e.y);
-		swing.setLabel(txt);
+		//swing.setLabel(txt);
 	}
 	void processWindowEvent(WindowEvent& e) {
 		if (e.type == WindowEvent::WINDOW_CLOSING) {

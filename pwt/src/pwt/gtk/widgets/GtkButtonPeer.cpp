@@ -59,7 +59,7 @@ pwt::String GtkButtonPeer::getLabel(Component* c) {
 	return text;
 }
 
-void GtkButtonPeer::setLabel(Component* c, pwt::String text) {
+void GtkButtonPeer::setLabel(Component* c, const pwt::String& text) {
 	GtkWidget *button;
 	GtkWidget *label;
 	GtkComponent_t* t;

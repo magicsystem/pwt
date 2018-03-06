@@ -12,22 +12,10 @@ Button::Button() {
 }
 
 Button::~Button() {
-	ButtonPeer* peer = getButtonPeer();
-	if (peer != 0) {
-		peer->dispose(this);
-		this->peer = 0;
-	}
-}
-ComponentPeer* Button::getComponentPeer() {
-	return getButtonPeer();
-}
-
-ButtonPeer* Button::getButtonPeer() {
-	return (ButtonPeer*) this->peer;
 }
 
 String Button::getLabel() {
-	ButtonPeer* peer = getButtonPeer();
+	ButtonPeer* peer = dynamic_cast<ButtonPeer*>(this->peer);
 	if (peer != 0) {
 		return peer->getLabel(this);
 	} else
@@ -35,16 +23,17 @@ String Button::getLabel() {
 }
 void pwt::Button::create(Container* parent) {
 	ButtonPeer* peer = parent->getToolkit()->getButtonPeer();
-	peer->create(this, parent);
 	this->peer = peer;
+	peer->create(this, parent);
+
 }
 Button::Button(Container* parent) {
 	this->label = 0;
 	create(parent);
 }
 
-void Button::setLabel(String label) {
-	ButtonPeer* peer = getButtonPeer();
+void Button::setLabel(const String& label) {
+	ButtonPeer* peer = dynamic_cast<ButtonPeer*>(this->peer);
 	if (peer != 0) {
 		return peer->setLabel(this, label);
 	}

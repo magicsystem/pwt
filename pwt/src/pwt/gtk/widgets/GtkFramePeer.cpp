@@ -37,7 +37,7 @@ const char* GtkFramePeer::getTitle(Component* f) {
 	return title;
 }
 
-void GtkFramePeer::setTitle(Component* f, pwt::String title) {
+void GtkFramePeer::setTitle(Component* f, const pwt::String& title) {
 	GtkComponent_t* c;
 
 	gdk_threads_enter();

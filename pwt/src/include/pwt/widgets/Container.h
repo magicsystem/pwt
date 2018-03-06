@@ -10,10 +10,9 @@
 #include "Component.h"
 namespace pwt {
 class ContainerPeer;
-class PUBLIC Container : public Component {
-protected:
-	ComponentPeer* getComponentPeer();
-	virtual ContainerPeer* getContainerPeer();
+class PUBLIC Container: public Component {
+private:
+	Component* children;
 public:
 	Container();
 	~Container();

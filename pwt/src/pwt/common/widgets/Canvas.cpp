@@ -11,20 +11,7 @@ namespace pwt {
 
 Canvas::Canvas() {
 }
-
 Canvas::~Canvas() {
-	CanvasPeer* peer = getCanvasPeer();
-	if (peer != 0) {
-		peer->dispose(this);
-		this->peer = 0;
-	}
-}
-ComponentPeer* Canvas::getComponentPeer() {
-	return getCanvasPeer();
-}
-
-CanvasPeer* Canvas::getCanvasPeer() {
-	return (CanvasPeer*) this->peer;
 }
 
 void Canvas::create(Container* parent) {
@@ -33,3 +20,4 @@ void Canvas::create(Container* parent) {
 	this->peer = peer;
 }
 }  // namespace pwt
+

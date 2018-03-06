@@ -116,7 +116,7 @@ void String::copy(const char* str, int count) {
 		this->chars = 0;
 	}
 }
-String pwt::String::clone(IMem* mem) {
+String pwt::String::clone(IMem* mem) const {
 	String ret;
 	if (!this->isEmpty()) {
 		StringRef* ref = newString(this->getChars(), this->getLength(), mem);
@@ -134,7 +134,7 @@ String::String(int beginIndex, int count, const char* str) {
 	copy(str + beginIndex, count - beginIndex);
 }
 
-int String::getLength() {
+int String::getLength() const {
 	if (this->chars == 0)
 		return 0;
 	if (this->chars[0] == 0)
@@ -143,7 +143,7 @@ int String::getLength() {
 		return strlen(this->chars);
 }
 
-bool String::isEmpty() {
+bool String::isEmpty() const {
 	if (this->chars == 0)
 		return true;
 	if (this->chars[0] == 0) {
@@ -153,7 +153,7 @@ bool String::isEmpty() {
 	return false;
 }
 
-char String::charAt(int index) {
+char String::charAt(int index) const {
 	if (this->chars == 0)
 		return 0;
 	if (this->chars[0] == 0) {
@@ -165,7 +165,7 @@ char String::charAt(int index) {
 		return this->chars[index];
 }
 
-const char* String::getChars() {
+const char* String::getChars() const {
 	if (this->chars == 0)
 		return 0;
 	if (this->chars[0] == 0)
@@ -173,7 +173,7 @@ const char* String::getChars() {
 	return this->chars;
 }
 
-bool String::equals(String anotherString) {
+bool String::equals(const String& anotherString) const {
 	int n = getLength();
 	if (n == anotherString.getLength()) {
 		const char* v1 = this->getChars();
@@ -189,7 +189,8 @@ bool String::equals(String anotherString) {
 	return false;
 }
 
-bool String::regionMatches(int toffset, String other, int ooffset, int len) {
+bool String::regionMatches(int toffset, const String& other, int ooffset,
+		int len) const {
 	const char *ta = this->getChars();
 	int to = toffset;
 	const char* pa = other.getChars();
@@ -207,8 +208,8 @@ bool String::regionMatches(int toffset, String other, int ooffset, int len) {
 	return true;
 }
 
-bool String::regionMatches(bool ignoreCase, int toffset, String other,
-		int ooffset, int len) {
+bool String::regionMatches(bool ignoreCase, int toffset, const String& other,
+		int ooffset, int len) const {
 	const char* ta = this->getChars();
 	int to = toffset;
 	const char* pa = other.getChars();
@@ -248,7 +249,7 @@ bool String::regionMatches(bool ignoreCase, int toffset, String other,
 	return true;
 }
 
-bool String::startsWith(String prefix, int toffset) {
+bool String::startsWith(const String& prefix, int toffset) const {
 	const char* ta = this->getChars();
 	int to = toffset;
 	const char* pa = prefix.chars;
@@ -267,7 +268,7 @@ bool String::startsWith(String prefix, int toffset) {
 	return true;
 }
 
-int String::indexOf(int ch, int fromIndex) {
+int String::indexOf(int ch, int fromIndex) const {
 	int count = this->getLength();
 	if (fromIndex < 0) {
 		fromIndex = 0;
@@ -284,7 +285,7 @@ int String::indexOf(int ch, int fromIndex) {
 	return -1;
 }
 
-int String::lastIndexOf(int ch, int fromIndex) {
+int String::lastIndexOf(int ch, int fromIndex) const {
 	// handle most cases here (ch is a BMP code point or a
 	// negative value (invalid code point))
 	int i;
@@ -400,19 +401,19 @@ String String::concat(const char* a, int a_len, const char* b, int b_len) {
 	memcpy(&ref->data[a_len], b, b_len);
 	return ret;
 }
-String String::concat(String a, String b) {
+String String::concat(const String& a, const String& b) {
 	return concat(a.getChars(), a.getLength(), b.getChars(), b.getLength());
 }
 
-String String::concat(String a, const char* str) {
+String String::concat(const String& a, const char* str) {
 	return concat(a.getChars(), a.getLength(), str, -1);
 }
 
-String String::concat(String a, char ch) {
+String String::concat(const String& a, char ch) {
 	return concat(a.getChars(), a.getLength(), &ch, 1);
 }
 
-String String::substring(int beginIndex, int endIndex) {
+String String::substring(int beginIndex, int endIndex) const {
 	if (beginIndex < 0) {
 		return String();
 	}
@@ -574,19 +575,47 @@ int String::utf8_to_unicode(const char* utf8, int utf8_lenght, wchar_t *unicode,
 		unicode[i] = 0;
 	return i;
 }
-String String::fromUnicode(const wchar_t* wchar, int length) {
+String String::fromUnicode(const wchar_t* wchar, int length, IMem* mem) {
+	String ret;
+	if (wchar == 0)
+		return ret;
+	int count = utf8_from_unicode(wchar, length, 0, 0);
+	if (count <= 0)
+		return ret;
+	StringRef* ref = newString(count + 1, mem);
+	if (ref == 0)
+		return ret;
+	utf8_from_unicode(wchar, length, ref->data, ref->length);
+	ret.ref = ref;
+	return ret;
 }
 
-String String::fromUTF8(const char* str, int length) {
+String String::fromUTF8(const char* str, int length, IMem* mem) {
+	String ret;
+	StringRef* ref = newString(str, length, mem);
+	ret.ref = ref;
+	return ret;
 }
 
-String String::fromASCII(const char* str, int length) {
+String String::fromASCII(const char* str, int length, IMem* mem) {
+	String ret;
+	StringRef* ref = newString(str, length, mem);
+	ret.ref = ref;
+	return ret;
 }
 
-int String::toUnicode(const wchar_t* wchar, int length) {
+int String::toUnicode(wchar_t* wchar, int length) const {
+	return utf8_to_unicode(this->getChars(), this->getLength(), wchar, length);
 }
 
-wchar_t* String::toUnicode() {
+wchar_t* String::toUnicode(IMem* mem) const {
+	wchar_t* ret = 0;
+	int count = utf8_to_unicode(this->getChars(), this->getLength(), 0, 0);
+	if (count <= 0)
+		return ret;
+	ret = new (mem) wchar_t[count + 1];
+	utf8_to_unicode(this->getChars(), this->getLength(), ret, count + 1);
+	return ret;
 }
 } /* namespace pwt */
 

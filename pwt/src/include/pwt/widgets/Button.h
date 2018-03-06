@@ -13,16 +13,13 @@ class ButtonPeer;
 class PUBLIC Button: public Component {
 private:
 	const char* label;
-protected:
-	ComponentPeer* getComponentPeer();
-	virtual ButtonPeer* getButtonPeer();
 public:
 	Button();
 	Button(Container* parent);
-	void create(Container* parent);
 	~Button();
+	void create(Container* parent);
 	String getLabel();
-	void setLabel(String label);
+	void setLabel(const String& label);
 };
 }  // namespace pwt
 #endif /* INCLUDE_PWT_WIDGETS_BUTTON_H_ */
